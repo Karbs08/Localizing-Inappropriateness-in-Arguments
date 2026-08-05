@@ -1,0 +1,40 @@
+# Reproducible environment for the span-localization notebooks.
+#
+# The core Hugging Face and PyTorch versions match the versions already used
+# in the MIL notebook. The remaining versions provide a stable Python 3.11
+# environment for data processing, visualization, explainability, and notebooks.
+#
+# Install all dependencies with:
+#   python -m pip install -r requirements.txt
+#
+# Note: On CUDA systems, PyTorch may be installed separately using the wheel
+# recommended for the available CUDA version before running the command above.
+
+# Core machine-learning stack
+torch==2.5.1
+transformers==4.46.3
+datasets==3.1.0
+pyarrow==18.1.0
+accelerate>=0.26.0,<2.0.0
+sentencepiece>=0.2.0,<1.0.0
+protobuf>=4.25.0,<6.0.0
+
+# Data processing and evaluation
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.5.2
+tqdm==4.67.1
+
+# Visualization
+matplotlib==3.9.2
+
+# Explainability methods
+shap==0.46.0
+captum==0.7.0
+
+# Jupyter environment
+ipython==8.29.0
+ipykernel==6.29.5
+ipywidgets==8.1.5
+jupyterlab==4.3.1
+notebook==7.3.1
