@@ -107,9 +107,7 @@ The Hugging Face model card describes the model as a DeBERTa-v2-based text class
 In this project, the probability assigned to `LABEL_1` is denoted by:
 
 $$
-p_{\mathrm{inappropriate}}(x)
-=
-P(y=\mathrm{inappropriate}\mid x)
+p_{\mathrm{inappropriate}}(x) = P(y=\mathrm{inappropriate}\mid x)
 $$
 
 All predictions of the original document-level classifier use the argument text, `post_text`, as input. The issue is retained as metadata and may be used by separate experimental components, such as the MIL span encoder, but it is not added to the input of the original binary classifier.
