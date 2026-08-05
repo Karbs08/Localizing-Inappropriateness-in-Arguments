@@ -38,3 +38,7 @@ ipykernel==6.29.5
 ipywidgets==8.1.5
 jupyterlab==4.3.1
 notebook==7.3.1
+
+# LLM silver-reference generation
+google-genai==2.13.0
+python-dotenv==1.2.2
