@@ -124,9 +124,7 @@ The model is used for two purposes:
 Let an argument be represented by $x$, and let the fixed document-level classifier be $f$. The classifier returns the probability of the inappropriate class:
 
 $$
-f_1(x)
-=
-P(y=1\mid x)
+f_1(x) = P(y=1\mid x)
 $$
 
 The span-localization task is to identify one or more spans:
@@ -285,9 +283,7 @@ Multiple Instance Learning is the only primary method in this repository that tr
 Each argument is represented as a **bag**, while automatically generated candidate spans are treated as latent **instances**:
 
 $$
-B_i
-=
-\{s_{i1}, s_{i2}, \ldots, s_{im}\}
+B_i = \{s_{i1}, s_{i2}, \ldots, s_{im}\}
 $$
 
 Only the argument-level label is observed. The model learns instance scores and aggregates them into a bag-level prediction.
@@ -303,8 +299,8 @@ The MIL encoder receives the discussion issue and a candidate span. Including th
 Several pooling strategies are explored:
 
 - max pooling;
-- top-$k$ mean pooling;
-- top-$k$ noisy-or pooling.
+- top- $k$ mean pooling;
+- top- $k$ noisy-or pooling.
 
 After training, the highest-ranked candidate spans are selected and evaluated against the **original Ziegenbein classifier** using the same perturbation protocol as the post-hoc methods.
 
@@ -445,11 +441,7 @@ For an argument $x$ and selected spans $S$, let $x^{\mathrm{abl}(S)}$ denote the
 The probability drop is:
 
 $$
-\Delta p(x,S)
-=
-p_{\mathrm{inappropriate}}(x)
--
-p_{\mathrm{inappropriate}}\left(x^{\mathrm{abl}(S)}\right)
+\Delta p(x,S) = p_{\mathrm{inappropriate}}(x) - p_{\mathrm{inappropriate}}\left(x^{\mathrm{abl}(S)}\right)
 $$
 
 Interpretation:
@@ -463,20 +455,13 @@ A larger positive drop suggests that the selected spans contain evidence used by
 The positive drop rate is:
 
 $$
-\mathrm{PDR}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\mathbb{1}\left[\Delta p_i > 0\right]
+\mathrm{PDR} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{1}\left[\Delta p_i > 0\right]
 $$
 
 The masked-token ratio is:
 
 $$
-r_i
-=
-\frac{\text{number of masked model tokens in }x_i}
-{\text{number of model tokens in }x_i}
+r_i = \frac{\text{number of masked model tokens in }x_i} {\text{number of model tokens in }x_i}
 $$
 
 Reported perturbation metrics include:
@@ -498,34 +483,26 @@ Let $M$ be the set of positions selected by a localization method and $R$ the se
 Precision is:
 
 $$
-\mathrm{Precision}
-=
-\frac{|M\cap R|}{|M|}
+\mathrm{Precision} = \frac{|M\cap R|}{|M|}
 $$
 
 Recall is:
 
 $$
-\mathrm{Recall}
-=
-\frac{|M\cap R|}{|R|}
+\mathrm{Recall} = \frac{|M\cap R|}{|R|}
 $$
 
 F1 is:
 
 $$
-\mathrm{F1}
-=
-\frac{2\cdot\mathrm{Precision}\cdot\mathrm{Recall}}
+\mathrm{F1} = \frac{2\cdot\mathrm{Precision}\cdot\mathrm{Recall}}
 {\mathrm{Precision}+\mathrm{Recall}}
 $$
 
 Intersection over union is:
 
 $$
-\mathrm{IoU}
-=
-\frac{|M\cap R|}{|M\cup R|}
+\mathrm{IoU} = \frac{|M\cap R|}{|M\cup R|}
 $$
 
 The overlap evaluation also considers whether at least one selected candidate overlaps the reference and, for ranked candidate spans, which rank first achieves an overlap.
