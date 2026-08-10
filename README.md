@@ -6,9 +6,9 @@ The project starts from a pretrained binary appropriateness classifier that pred
 
 > **Which words or text spans caused, supported, or best explain the classifier's prediction that an argument is inappropriate?**
 
-Because the underlying corpus provides document-level labels but no human-annotated rationale spans, the project studies span localization under **weak supervision**. It compares post-hoc attribution methods, lexical and random baselines, and a Multiple Instance Learning approach. The extracted spans are evaluated through classifier perturbations, comparison with LLM-generated silver-reference spans, and a planned human evaluation.
+Because the underlying corpus provides document-level labels but no human-annotated rationale spans, the project studies span localization under **weak supervision**. It compares post-hoc attribution methods, lexical and random baselines, and a Multiple Instance Learning approach. The extracted spans are evaluated through classifier perturbations, comparison with LLM-generated silver-reference spans, and a LimeSurvey-based human evaluation.
 
-> **Project status:** Work in progress. The core localization methods are implemented. Some cross-method evaluation results, the final human study, and the consolidated result reporting are still being completed.
+> **Project status:** Work in progress. The core localization methods and the automated LimeSurvey human-study generation pipeline are implemented. Some cross-method evaluation results, the deployment and analysis of the human study, and the consolidated result reporting are still being completed.
 
 ---
 
@@ -22,9 +22,11 @@ Because the underlying corpus provides document-level labels but no human-annota
 - [Evaluation](#evaluation)
 - [Repository structure](#repository-structure)
 - [Installation](#installation)
+- [Makefile workflow](#makefile-workflow)
 - [Google Gemini API setup](#google-gemini-api-setup)
 - [Data preparation](#data-preparation)
 - [Running the notebooks](#running-the-notebooks)
+- [Human study generation](#human-study-generation)
 - [Reproducibility](#reproducibility)
 - [Current status](#current-status)
 - [Limitations](#limitations)
@@ -511,21 +513,57 @@ These metrics measure agreement with the silver reference, not absolute correctn
 
 ### Human evaluation
 
-A human evaluation is planned to assess qualities that automatic metrics cannot reliably capture.
+The human evaluation is implemented as a **blinded LimeSurvey study**. Its purpose is to assess semantic explanation quality that cannot be established by perturbation scores or overlap with the LLM silver reference alone.
 
-Participants are shown:
+> **Survey link:** _[LimeSurvey link will be added here]_
 
-- the discussion issue;
-- the full argument;
-- highlighted spans produced by anonymized methods.
+The survey follows the concept and taxonomy of inappropriateness introduced by Ziegenbein et al. (2023). Before the actual ratings, participants receive:
 
-The method order and sampled arguments are randomized. Participants rate each explanation on a 1–10 scale for:
+- study information, consent, and a content warning;
+- a short explanation of inappropriateness in argumentation;
+- a simplified overview of the four core inappropriateness categories;
+- an explicit note that inappropriateness is subjective;
+- a reminder to judge each argument in the context of its discussion issue rather than by agreement with its position;
+- a comprehension question;
+- a short practice example.
 
-- **Relevance:** Do the highlighted spans indicate actual reasons for the argument's inappropriateness?
-- **Sufficiency:** Are the highlighted spans sufficient to judge why the argument is inappropriate?
-- **Precision:** Do the highlights consist mainly of relevant evidence, without unnecessary surrounding text?
+Each completed participation contains **seven argument pages**. For every argument, the participant first sees the discussion issue and the argument **without highlights** and rates its overall inappropriateness on a 1–7 scale. Afterwards, three highlighted explanations are shown as **Explanation A**, **Explanation B**, and **Explanation C**. The underlying source names are hidden from participants.
 
-The human study is intended to complement rather than replace the automatic evaluation. In particular, it can distinguish semantically meaningful spans from perturbations that affect the classifier for technical or distributional reasons.
+Each highlighted explanation is rated on a 1–7 scale according to four criteria:
+
+- **Relevance:** The highlighted spans identify text that contributes to the argument being inappropriate.
+- **Sufficiency:** Taken together, the highlighted spans provide enough evidence to justify classifying the argument as inappropriate.
+- **Completeness:** All or nearly all important reasons for the argument's inappropriateness have been highlighted.
+- **Precision:** The highlights contain little or no unnecessary or unrelated text.
+
+Participants may select a dedicated *Not assessable* option if they do not consider the argument inappropriate. After rating the three explanations, they also indicate which explanation best localizes the reasons for inappropriateness, with an additional no-preference option and an optional comment field.
+
+The study draws from seven explanation sources:
+
+- SHAP;
+- Integrated Gradients;
+- Attention;
+- TF-IDF;
+- Multiple Instance Learning;
+- Random baseline;
+- the LLM-generated silver reference.
+
+The LLM spans remain a **silver reference**, not a seventh primary localization method or human gold standard. They are included as a blinded reference condition so that their perceived explanation quality can be compared with the other approaches.
+
+The questionnaire uses seven internally balanced variants. Within every completed participation:
+
+- 7 arguments are evaluated;
+- 3 explanations are shown per argument;
+- 21 explanation ratings are completed;
+- every explanation source appears exactly 3 times;
+- every pair of explanation sources appears together exactly once;
+- every explanation source appears exactly once as A, once as B, and once as C.
+
+A hidden LimeSurvey variable assigns one of the seven questionnaire variants. This keeps the method presentation balanced while allowing all participants to use the same public survey link.
+
+The generated survey is configured for anonymous responses. It does not store names, email addresses, IP addresses, referrer URLs, or timestamps. Page-level response timings are enabled, and a cookie is used to reduce accidental repeated participation.
+
+The human study complements the automatic evaluation rather than replacing it. In particular, it allows semantically meaningful and concise explanations to be distinguished from perturbations that affect the classifier for technical or distributional reasons.
 
 ---
 
@@ -558,6 +596,19 @@ Localizing-Inappropriateness-in-Arguments/
 │   ├── mask_vs_delete.ipynb
 │   ├── methods_vs_baselines.ipynb
 │   └── methods_vs_llm.ipynb
+├── human_study/
+│   ├── prepare_survey_data.py
+│   ├── generate_limesurvey.py
+│   ├── survey_input/
+│   │   ├── study_items.csv
+│   │   └── selected_argument_ids.txt
+│   └── survey_output/
+│       ├── span_human_study_import.txt
+│       ├── selected_arguments.csv
+│       ├── variant_design.csv
+│       ├── question_mapping.csv
+│       ├── preview_version_1.html
+│       └── generation_report.txt
 ├── results/
 │   ├── ablation_comparison/
 │   ├── evaluation/
@@ -569,10 +620,14 @@ Localizing-Inappropriateness-in-Arguments/
 │   ├── tfidf_baseline_results/
 │   └── llm_reference/
 ├── src/
+│   ├── survey/
+│   │   ├── limesurvey_tsv.py
+│   │   └── survey_design.py
 │   ├── __init__.py
 │   ├── data.py
 │   ├── prepare_data.py
 │   └── utils.py
+├── Makefile
 ├── requirements.txt
 └── README.md
 ```
@@ -618,6 +673,23 @@ The `data/` directory is generated locally by `python -m src.prepare_data`. Larg
 | `evaluation/methods_vs_baselines.ipynb` | Places the primary localization methods next to the random and TF-IDF baselines under a shared set of faithfulness, efficiency, and span-size metrics. |
 | `evaluation/methods_vs_llm.ipynb` | Compares method spans with the Gemini silver reference using overlap-oriented metrics such as precision, recall, F1, IoU, hit rate, and rank-based measures. |
 
+#### Human study
+
+| File or path | Purpose |
+|---|---|
+| `human_study/prepare_survey_data.py` | Reads the fixed final outputs of Random, TF-IDF, Attention, Integrated Gradients, SHAP, MIL, and the LLM silver reference. It keeps common test true positives, converts each method's offsets into one shared span representation, selects seven arguments reproducibly, and writes the survey input files. |
+| `human_study/generate_limesurvey.py` | Builds the complete blinded LimeSurvey questionnaire from the prepared study items and selected argument IDs. It creates the balanced questionnaire variants, rating questions, preference questions, consent and introduction pages, and LimeSurvey import artifacts. |
+| `human_study/survey_input/study_items.csv` | Unified long-format study input containing the seven selected arguments for all seven explanation sources, including their highlighted character spans. |
+| `human_study/survey_input/selected_argument_ids.txt` | Stores the seven reproducibly selected `global_row_id` values used by the generated questionnaire. |
+| `human_study/survey_output/span_human_study_import.txt` | Complete LimeSurvey TSV survey structure that can be imported into LimeSurvey. |
+| `human_study/survey_output/selected_arguments.csv` | Human-readable list of the seven arguments included in the survey. |
+| `human_study/survey_output/variant_design.csv` | Records which argument and which blinded explanations A/B/C appear at each position in each of the seven questionnaire variants. |
+| `human_study/survey_output/question_mapping.csv` | Maps blinded LimeSurvey question codes and display labels back to the underlying explanation sources for later analysis. |
+| `human_study/survey_output/preview_version_1.html` | Static browser preview of the introduction and highlighted stimuli for questionnaire variant 1. |
+| `human_study/survey_output/generation_report.txt` | Summarizes the generated survey, balance guarantees, scale, and checks that should be completed before activation. |
+
+The generated survey is a study artifact, not an additional localization method. In particular, the LLM condition remains the project's silver reference.
+
 #### Results
 
 | Path | Purpose |
@@ -650,8 +722,11 @@ Each method-specific result directory may contain several artifact types:
 | `src/data.py` | Loads and validates the canonical processed dataset and returns the full data frame or the individual train, validation, and test splits. |
 | `src/prepare_data.py` | Downloads or loads the corpus, stores the raw splits, creates stable IDs, normalizes texts, computes the original classifier outputs, and writes the processed dataset and metadata. |
 | `src/utils.py` | Contains reusable project-wide helpers for text normalization, split assignment, classifier inference, confusion types, span perturbation, highlighting, and serialization. |
-| `requirements.txt` | Defines the Python packages needed for data preparation, notebooks, attribution methods, evaluation, and the Gemini API integration. |
-| `README.md` | Documents the research context, setup, methods, data flow, evaluation protocol, and repository usage. |
+| `src/survey/limesurvey_tsv.py` | Provides the reusable LimeSurvey TSV builder used by the human-study generator. |
+| `src/survey/survey_design.py` | Constructs the balanced questionnaire variants used to distribute explanation sources across arguments and labels A/B/C. |
+| `Makefile` | Provides reproducible convenience commands for environment setup, data preparation, Jupyter startup, cleanup, and human-study generation. |
+| `requirements.txt` | Defines the Python packages needed for data preparation, notebooks, attribution methods, evaluation, the Gemini API integration, and survey generation. |
+| `README.md` | Documents the research context, setup, methods, data flow, evaluation protocol, human-study workflow, and repository usage. |
 
 Method-specific attribution, span-selection, training, and result-building logic remains in the corresponding notebook. Shared logic that must behave identically across methods belongs in `src/`.
 
@@ -676,6 +751,24 @@ The smaller preprocessing and evaluation steps can also run on CPU.
 git clone https://github.com/Karbs08/Localizing-Inappropriateness-in-Arguments.git
 cd Localizing-Inappropriateness-in-Arguments
 ```
+
+### Recommended: initialize with Make
+
+On Linux or macOS, the complete local setup can be initialized from the repository root with:
+
+```bash
+make init
+```
+
+This creates `.venv`, upgrades pip, installs the dependencies from `requirements.txt`, and prepares the canonical Appropriateness Corpus used by the experiments.
+
+After initialization, JupyterLab can be started with:
+
+```bash
+make jupyter
+```
+
+The manual setup steps below remain useful when `make` is unavailable or when individual setup steps need to be run separately.
 
 ### 2. Create a virtual environment
 
@@ -742,6 +835,41 @@ deactivate
 
 ---
 
+
+
+## Makefile workflow
+
+The project-level `Makefile` provides convenience targets for the recurring setup and generation steps.
+
+| Command | Purpose |
+|---|---|
+| `make init` | Create `.venv`, install all requirements, and prepare the canonical dataset. |
+| `make venv` | Create the local virtual environment without running the remaining setup steps. |
+| `make install` | Install or update packages from `requirements.txt`. |
+| `make prepare-data` | Prepare the shared dataset if the processed files are missing. |
+| `make force-prepare-data` | Explicitly rerun `python -m src.prepare_data`, for example after changing preprocessing or classifier settings. |
+| `make kernel` | Register the project environment as a named Jupyter kernel. |
+| `make jupyter` | Start JupyterLab from the repository root using the project environment. |
+| `make study` | Prepare the human-study input data and generate the LimeSurvey survey artifacts. |
+| `make clean-data` | Remove the locally generated raw and processed dataset files. |
+| `make clean-venv` | Remove the local `.venv` environment. |
+
+The human-study target executes the two study-generation stages in order:
+
+```makefile
+study:
+	python human_study/prepare_survey_data.py
+	python human_study/generate_limesurvey.py
+```
+
+Because the current `study` target invokes `python` directly, the project virtual environment should be activated before running it:
+
+```bash
+source .venv/bin/activate
+make study
+```
+
+The human study is intentionally **not** part of `make init`. It depends on fixed final result files from all explanation sources and should only be generated after the relevant method, baseline, and LLM-reference outputs are available.
 
 ## Google Gemini API setup
 
@@ -832,7 +960,13 @@ API keys must never be written to result files, notebooks, logs, or metadata exp
 
 ## Data preparation
 
-Before running the experiment notebooks, prepare the shared dataset once from the repository root:
+Before running the experiment notebooks, prepare the shared dataset once from the repository root. This is already included in `make init`. It can also be run independently with:
+
+```bash
+make prepare-data
+```
+
+or directly with:
 
 ```bash
 python -m src.prepare_data
@@ -885,7 +1019,13 @@ The data-loading functions do not need to be re-exported through `src/__init__.p
 
 ## Running the notebooks
 
-Start Jupyter from the **repository root**:
+Start Jupyter from the **repository root**, preferably through the Makefile:
+
+```bash
+make jupyter
+```
+
+Alternatively, with the virtual environment activated:
 
 ```bash
 jupyter lab
@@ -900,17 +1040,16 @@ from src.utils import normalize_text
 
 Recommended order:
 
-1. activate the virtual environment;
-2. install the requirements;
-3. run `python -m src.prepare_data`;
-4. configure `GEMINI_API_KEY` only when the LLM silver reference must be generated;
-5. start JupyterLab from the repository root;
-6. select the project kernel;
-7. run the baseline and method notebooks needed for the experiment;
-8. verify their outputs in the corresponding method-specific directories under `results/`;
-9. generate or load the validated LLM silver reference;
-10. run the notebooks under `evaluation/` after all required final method files exist;
-11. store consolidated tables and figures under `results/evaluation/` and `results/ablation_comparison/`.
+1. run `make init` once to create the environment, install dependencies, and prepare the dataset;
+2. configure `GEMINI_API_KEY` only when the LLM silver reference must be generated;
+3. start JupyterLab from the repository root with `make jupyter`;
+4. select the project kernel if required;
+5. run the baseline and method notebooks needed for the experiment;
+6. verify their outputs in the corresponding method-specific directories under `results/`;
+7. generate or load the validated LLM silver reference;
+8. run the notebooks under `evaluation/` after all required final method files exist;
+9. store consolidated tables and figures under `results/evaluation/` and `results/ablation_comparison/`;
+10. once all fixed final explanation files are available, generate the human study with `make study`.
 
 The baseline and method notebooks are designed to be executable independently after the canonical dataset has been prepared. They still load the original classifier because each approach needs it for attribution, internal representations, span scoring, or perturbation evaluation.
 
@@ -928,6 +1067,94 @@ For exploratory runs, notebook-level debug limits can be used where available. F
 
 ---
 
+
+## Human study generation
+
+The complete LimeSurvey survey can be regenerated from the fixed final explanation files with:
+
+```bash
+source .venv/bin/activate
+make study
+```
+
+The target runs two scripts sequentially.
+
+### 1. Prepare survey data
+
+```bash
+python human_study/prepare_survey_data.py
+```
+
+This script reads the final argument-level outputs for:
+
+- Random;
+- TF-IDF;
+- Attention;
+- Integrated Gradients;
+- SHAP;
+- MIL;
+- the LLM silver reference.
+
+The script restricts the inputs to the held-out **test split** and, where available, **true positives**. It converts the method-specific character-offset columns into one common span representation and keeps only arguments for which all seven explanation sources are available.
+
+Using a fixed random seed, it selects seven eligible arguments and writes:
+
+```text
+human_study/survey_input/study_items.csv
+human_study/survey_input/selected_argument_ids.txt
+```
+
+`study_items.csv` is the unified long-format survey input. Each row identifies an argument and an explanation source and contains the original issue, text, serialized highlighted spans, and selected automatic-evaluation metadata.
+
+### 2. Generate the LimeSurvey questionnaire
+
+```bash
+python human_study/generate_limesurvey.py
+```
+
+The generator reads the prepared study items and selected argument IDs and creates the complete LimeSurvey study under:
+
+```text
+human_study/survey_output/
+```
+
+The most important generated files are:
+
+| File | Purpose |
+|---|---|
+| `span_human_study_import.txt` | Importable LimeSurvey questionnaire structure. |
+| `selected_arguments.csv` | The seven arguments included in the study. |
+| `variant_design.csv` | Complete balanced assignment of arguments and explanations across the seven questionnaire variants. |
+| `question_mapping.csv` | Mapping from blinded LimeSurvey question codes back to the actual explanation sources. |
+| `preview_version_1.html` | Static preview of the introduction and highlighted stimuli for variant 1. |
+| `generation_report.txt` | Generation summary and pre-activation validation checklist. |
+
+The generated questionnaire contains consent and a content warning, the Ziegenbein et al. definition and taxonomy of inappropriateness, a subjectivity note, a comprehension check, a practice example, seven argument pages, four explanation-quality criteria, direct explanation preferences, optional comments, and a final feedback field.
+
+### Import into LimeSurvey
+
+Import:
+
+```text
+human_study/survey_output/span_human_study_import.txt
+```
+
+into the target LimeSurvey instance.
+
+Before activating the study:
+
+1. open **Tools → Survey logic file** and check for errors or relevant warnings;
+2. preview the complete questionnaire;
+3. submit at least two test responses;
+4. verify that the selected version and question codes are exported correctly;
+5. verify anonymous-response, IP, referrer, cookie, and timing settings;
+6. inspect the highlighted spans and mobile presentation;
+7. only then activate the final survey.
+
+> **Public survey link:** _[LimeSurvey link will be added here]_
+
+After data collection, LimeSurvey responses should be exported with stable question codes so that `question_mapping.csv` can be used to map Explanation A/B/C back to the underlying explanation sources.
+
 ## Reproducibility
 
 The project follows several measures to keep experiments comparable:
@@ -943,7 +1170,10 @@ The project follows several measures to keep experiments comparable:
 - random configuration search retains sample-level outputs;
 - the final random baseline uses one concrete sample per argument;
 - LLM offsets are validated against the source text;
-- classifier probabilities before and after perturbation are retained.
+- classifier probabilities before and after perturbation are retained;
+- human-study argument selection uses a fixed random seed and the selected IDs are written to `selected_argument_ids.txt`;
+- the exact balanced questionnaire assignment is exported to `variant_design.csv`;
+- the blinded survey question codes are mapped back to explanation sources through `question_mapping.csv`.
 
 Exact reproducibility of LLM-generated annotations may additionally depend on:
 
@@ -973,12 +1203,15 @@ The LLM annotation files should therefore record the model name and relevant ann
 - [x] Perturbation-based evaluation within method notebooks
 - [x] LLM-generated silver-reference spans
 - [x] Argument-level and span-level result exports
+- [x] Complete silver-reference overlap evaluation
+- [x] Automated human-study data preparation
+- [x] Balanced LimeSurvey questionnaire generation
 
 ### In progress
 
-- [ ] Consolidated cross-method result tables
-- [ ] Complete silver-reference overlap evaluation
-- [ ] Human evaluation
+
+- [ ] Final LimeSurvey validation and public deployment
+- [ ] Human-study participant data collection and analysis
 - [ ] Final figures and statistical analysis
 - [ ] Final documentation of selected configurations and results
 

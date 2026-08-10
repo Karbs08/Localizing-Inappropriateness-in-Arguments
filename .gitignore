@@ -209,3 +209,4 @@ __marimo__/
 # Exclude large amount of data
 results/
 data/
+temp/
