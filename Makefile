@@ -97,3 +97,7 @@ clean-venv:
 study:
 	python human_study/prepare_survey_data.py
 	python human_study/generate_limesurvey.py
+
+study-results:
+	python human_study/reshape_survey_results.py \
+		--responses human_study/survey_results/survey_results_raw.csv
