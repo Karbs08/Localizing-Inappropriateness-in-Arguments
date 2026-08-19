@@ -34,6 +34,7 @@ from __future__ import annotations
 import html
 import re
 import unicodedata
+from functools import lru_cache
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, Literal
@@ -453,21 +454,68 @@ def apply_ablation_to_text(
     return perturbed_text
 
 
+
+_DEFAULT_MASK_TOKENIZER_NAME = "timonziegenbein/appropriateness-classifier-binary"
+
+@lru_cache(maxsize=1)
+def _get_default_mask_tokenizer() -> Any:
+    """Load the classifier tokenizer once for token-count-preserving masking."""
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(_DEFAULT_MASK_TOKENIZER_NAME, use_fast=True)
+    if not getattr(tokenizer, "is_fast", False):
+        raise RuntimeError("Token-count-preserving masking requires a fast tokenizer with character offset mappings.")
+    return tokenizer
+
+
 def mask_spans_in_text(
     text: str,
     spans: Sequence[Mapping[str, Any]] | None,
     mask_token: str = "[MASK]",
     *,
+    tokenizer: Any | None = None,
     collapse_whitespace: bool = False,
 ) -> str:
-    """Replace character spans with the model mask token."""
-    return apply_ablation_to_text(
-        text,
-        spans,
-        "mask",
-        mask_token=mask_token,
-        collapse_whitespace=collapse_whitespace,
-    )
+    """Replace every model token covered by a character span with one mask token.
+
+    A selected span remains one explanation span, but its perturbation contains
+    as many mask tokens as the original span contains classifier tokens.
+    If no tokenizer is supplied, the binary appropriateness-classifier tokenizer
+    is loaded lazily and cached.
+    """
+    text = str(text)
+    offsets = _sorted_non_overlapping_spans(text, spans)
+    if not offsets:
+        return text
+    if tokenizer is None:
+        tokenizer = _get_default_mask_tokenizer()
+    encoding = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
+    token_offsets = encoding.get("offset_mapping")
+    if token_offsets is None:
+        raise RuntimeError("The tokenizer did not return character offset mappings.")
+    parts: list[str] = []
+    last_end = 0
+    for start, end in offsets:
+        parts.append(text[last_end:start])
+        n_model_tokens = sum(
+            1
+            for token_start, token_end in token_offsets
+            if int(token_end) > int(token_start)
+            and int(token_end) > start
+            and int(token_start) < end
+        )
+        if n_model_tokens <= 0:
+            raise ValueError(
+                "A non-empty character span did not overlap any classifier token: "
+                f"({start}, {end})."
+            )
+        parts.append(" ".join([mask_token] * n_model_tokens))
+        last_end = end
+    parts.append(text[last_end:])
+    masked_text = "".join(parts)
+    if collapse_whitespace:
+        masked_text = re.sub(r"\s+", " ", masked_text).strip()
+    return masked_text
+
 
 
 def delete_spans_from_text(
