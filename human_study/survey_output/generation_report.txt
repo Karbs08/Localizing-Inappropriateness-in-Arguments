@@ -1,20 +1,30 @@
 LIMESURVEY SURVEY GENERATION REPORT
 =======================================
 Import file: span_human_study_import.txt
-Survey rows: 2738
-Arguments: 7
+Survey rows: 2398
+Arguments per participant: 7
 Variants: 7
 Methods: shap, ig, attention, tfidf, mil, random, llm
+Methods per argument: 4
 Rating scale: 1-7
-Explanation ratings per participant: 21
+Explanation ratings per participant: 28
+Criterion responses per participant: 56
+Rankings per participant: 7
 
-Balance guarantees per completed participant:
-- every method appears exactly 3 times
-- every method pair appears together exactly once
-- every method appears exactly once as A, B, and C
+Balance guarantees within every completed participant:
+- every argument is shown exactly once
+- every method is evaluated exactly 4 times
+- every method pair is shown together exactly 2 times
+- every method appears exactly 1 times as A, B, C, and D
+
+Across all seven questionnaire versions:
+- every argument cycles through all seven four-method blocks
+- every argument-method combination appears in 4 of the 7 versions
+- every method pair appears together for an argument in 2 of the 7 versions
 
 Before activation:
 1. Import the .txt file in LimeSurvey.
 2. Open Tools / Survey logic file and resolve any reported errors.
 3. Preview and complete at least two test responses.
 4. Verify anonymous-response, IP, referrer, cookie and timing settings.
+5. Export responses using Question codes and Answer codes for evaluation.

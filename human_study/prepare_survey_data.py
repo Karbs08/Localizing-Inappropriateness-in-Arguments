@@ -12,6 +12,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 RESULT_DIR = REPO_ROOT / "results"
 SURVEY_INPUT_DIR = REPO_ROOT / "human_study" / "survey_input"
 
+# 7 or 14 arguments = two complete 7-block cycles in the survey design.
+# This allows exact balancing of seven methods when four methods are shown
+# per argument.
 RANDOM_SEED = 42
 N_ARGUMENTS = 7
 
@@ -19,7 +22,7 @@ N_ARGUMENTS = 7
 METHOD_FILES = {
     "random": RESULT_DIR / "random_baseline_results/random_best_config_test_per_argument.csv",
     "tfidf": RESULT_DIR / "tfidf_baseline_results/final_test_all_window2_topk8/tfidf_final_test_all_window2_topk8_argument_level.csv",
-    "attention": RESULT_DIR / "attention_results/attention_results_word_boundary/attention_final_all_splits_last_cls_q0.6_window3_argument_level.csv",
+    "attention": RESULT_DIR / "attention_results/attention_results_final/attention_final_all_splits_rollout_q0.4_window0_argument_level.csv",
     "ig": RESULT_DIR / "ig_results/ig_results_final/ig_final_all_splits_q0.5_window1_argument_level.csv",
     "shap": RESULT_DIR / "shap_results/shap_results_final/shap_final_test_q0.5_window0_argument_level.csv",
     "mil": RESULT_DIR / "mil_results/mil_span_run_singles/mil_results_final/mil_final_all_splits_pool=topk_noisy_or__topk=3__spans=15__stride=4__freeze=True_argument_level.csv",
@@ -81,7 +84,6 @@ def parse_list(value):
 
     if isinstance(value, str):
         value = value.strip()
-
         if not value:
             return []
 
@@ -178,13 +180,14 @@ def prepare_method_data(argument_dfs):
     return prepared_method_dfs
 
 
-def build_study_items(prepared_method_dfs):
-    common_ids = set.intersection(
-        *[
-            set(df["global_row_id"])
-            for df in prepared_method_dfs.values()
-        ]
-    )
+def build_study_pool(prepared_method_dfs):
+    # The LLM annotations define the eligible reference pool. Only arguments
+    # that are also available for every other method remain in the survey pool.
+    common_ids = set(prepared_method_dfs["llm"]["global_row_id"])
+    for method, df in prepared_method_dfs.items():
+        if method == "llm":
+            continue
+        common_ids &= set(df["global_row_id"])
 
     study_rows = []
 
@@ -203,6 +206,9 @@ def build_study_items(prepared_method_dfs):
                         row["study_spans"],
                         ensure_ascii=False,
                     ),
+                    # Keep automatic-evaluation metadata available for later
+                    # exploratory comparisons. These columns are not shown in
+                    # the survey.
                     "prob_drop": row.get("prob_drop", np.nan),
                     "masked_token_ratio": row.get(
                         "masked_token_ratio",
@@ -226,13 +232,18 @@ def build_study_items(prepared_method_dfs):
     )
 
 
-def select_arguments(study_items):
+def select_arguments(study_pool):
     eligible_ids = np.array(
-        sorted(study_items["global_row_id"].unique())
+        sorted(study_pool["global_row_id"].unique())
     )
 
-    rng = np.random.default_rng(RANDOM_SEED)
+    if len(eligible_ids) < N_ARGUMENTS:
+        raise ValueError(
+            f"Need at least {N_ARGUMENTS} eligible arguments, "
+            f"but only {len(eligible_ids)} are available."
+        )
 
+    rng = np.random.default_rng(RANDOM_SEED)
     return rng.choice(
         eligible_ids,
         size=N_ARGUMENTS,
@@ -243,12 +254,12 @@ def select_arguments(study_items):
 def main():
     argument_dfs = load_method_results()
     prepared_method_dfs = prepare_method_data(argument_dfs)
-    study_items = build_study_items(prepared_method_dfs)
-    selected_ids = select_arguments(study_items)
+    study_pool = build_study_pool(prepared_method_dfs)
+    selected_ids = select_arguments(study_pool)
 
     final_study_items = (
-        study_items[
-            study_items["global_row_id"].isin(selected_ids)
+        study_pool[
+            study_pool["global_row_id"].isin(selected_ids)
         ]
         .copy()
         .sort_values(["global_row_id", "method_id"])
@@ -265,6 +276,8 @@ def main():
         for global_row_id in selected_ids:
             file.write(f"{global_row_id}\n")
 
+    print(f"Eligible LLM-based survey pool: {study_pool['global_row_id'].nunique()} arguments")
+    print(f"Selected {len(selected_ids)} arguments with seed {RANDOM_SEED}")
     print(f"Wrote {study_items_path}")
     print(f"Wrote {selected_ids_path}")
 
