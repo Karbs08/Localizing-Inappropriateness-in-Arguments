@@ -70,6 +70,12 @@ __all__ = [
     "normalize_text",
     "predict_with_pipeline",
     "trim_char_span",
+    "build_ranking_specs",
+    "collect_token_indices_from_items",
+    "probability_to_logit",
+    "rank_indices_by_score",
+    "save_aopc_outputs",
+    "select_top_fraction_indices",
 ]
 
 
@@ -603,3 +609,174 @@ def make_json_serializable(obj: Any) -> Any:
         pass
 
     return obj
+
+
+# Functions to run Arae over the Perturbation Curve on Attribution based methods
+def select_top_fraction_indices(
+    ranked_indices: Sequence[int],
+    total_items: int,
+    fraction: float,
+    min_k: int = 1,
+) -> list[int]:
+    """Select the top-ranked indices for a fixed perturbation fraction."""
+    if total_items == 0:
+        return []
+
+    k = int(np.ceil(fraction * total_items))
+    k = max(min_k, k)
+    k = min(k, total_items)
+
+    return list(ranked_indices[:k])
+
+
+def rank_indices_by_score(
+    scores: Sequence[float],
+    candidate_indices: Sequence[int] | None = None,
+) -> list[int]:
+    """Rank candidate indices by score in descending order.
+
+    Ties are resolved by the original index to keep the ranking deterministic.
+    """
+    if candidate_indices is None:
+        candidate_indices = range(len(scores))
+
+    return sorted(
+        [int(idx) for idx in candidate_indices],
+        key=lambda idx: (-float(scores[idx]), idx),
+    )
+
+
+def collect_token_indices_from_items(
+    items: Sequence[Mapping[str, Any]],
+    selected_indices: Sequence[int],
+    *,
+    token_indices_key: str = "token_indices",
+) -> list[int]:
+    """Collect unique model-token indices belonging to selected items."""
+    return sorted({
+        int(token_idx)
+        for item_idx in selected_indices
+        for token_idx in items[item_idx][token_indices_key]
+    })
+
+
+def build_ranking_specs(
+    primary_name: str,
+    primary_ranked_indices: Sequence[int],
+    candidate_indices: Sequence[int],
+    random_runs: int,
+    rng: np.random.Generator,
+) -> list[tuple[str, int | None, list[int]]]:
+    """Build the primary ranking and matched random-ranking baselines."""
+    specs = [
+        (
+            primary_name,
+            None,
+            [int(idx) for idx in primary_ranked_indices],
+        )
+    ]
+
+    candidate_indices = np.asarray(
+        list(candidate_indices),
+        dtype=int,
+    )
+
+    for random_run in range(random_runs):
+        random_ranked_indices = (
+            rng.permutation(candidate_indices)
+            .astype(int)
+            .tolist()
+        )
+
+        specs.append(
+            (
+                "random",
+                random_run,
+                random_ranked_indices,
+            )
+        )
+
+    return specs
+
+
+def probability_to_logit(
+    probability: float,
+    eps: float = 1e-8,
+) -> float:
+    """Convert a probability into log-odds."""
+    probability = np.clip(
+        float(probability),
+        eps,
+        1 - eps,
+    )
+
+    return float(
+        np.log(
+            probability / (1 - probability)
+        )
+    )
+
+
+def save_aopc_outputs(
+    aopc_df: pd.DataFrame,
+    step_df: pd.DataFrame,
+    curve_summary: pd.DataFrame,
+    per_argument_aopc: pd.DataFrame,
+    global_summary: pd.DataFrame,
+    output_dir: str | Path,
+    prefix: str,
+    *,
+    raw_export_df: pd.DataFrame | None = None,
+) -> dict[str, Path]:
+    """Save the standard set of AOPC result tables."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    paths = {
+        "raw": output_dir / f"{prefix}_raw.csv",
+        "step": output_dir / f"{prefix}_step_summary.csv",
+        "curve": output_dir / f"{prefix}_curve_summary.csv",
+        "per_argument": output_dir / f"{prefix}_per_argument.csv",
+        "global": output_dir / f"{prefix}_global_summary.csv",
+    }
+
+    raw_df = (
+        aopc_df
+        if raw_export_df is None
+        else raw_export_df
+    )
+
+    raw_df.to_csv(
+        paths["raw"],
+        index=False,
+        encoding="utf-8",
+    )
+    step_df.to_csv(
+        paths["step"],
+        index=False,
+        encoding="utf-8",
+    )
+    curve_summary.to_csv(
+        paths["curve"],
+        index=False,
+        encoding="utf-8",
+    )
+    per_argument_aopc.to_csv(
+        paths["per_argument"],
+        index=False,
+        encoding="utf-8",
+    )
+    global_summary.to_csv(
+        paths["global"],
+        index=False,
+        encoding="utf-8",
+    )
+
+    print("Saved:")
+    for path in paths.values():
+        print(path)
+
+    return paths
