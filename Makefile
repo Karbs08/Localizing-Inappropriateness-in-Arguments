@@ -94,10 +94,12 @@ clean-venv:
 # Human study
 .PHONY: study
 
+# Prepare survey data and generate LimeSurvey XML for the human study.
 study:
 	python human_study/prepare_survey_data.py
 	python human_study/generate_limesurvey.py
 
+# Evaluate participant responses from the human study and generate a summary report and plots.
 study-evaluate:
 	python human_study/evaluate_survey_results.py \
 		--responses human_study/survey_results/survey_results_raw.csv \
