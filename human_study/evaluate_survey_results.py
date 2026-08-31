@@ -1001,6 +1001,78 @@ def main() -> None:
     ratings.to_csv(ratings_path, index=False)
     rankings.to_csv(rankings_path, index=False)
 
+    argument_comments = (
+        ratings[
+            [
+                "response_id",
+                "version",
+                "display_position",
+                "argument_index",
+                "global_row_id",
+                "issue",
+                "post_text",
+                "comment",
+            ]
+        ]
+        .drop_duplicates(
+            ["response_id", "global_row_id"]
+        )
+        .copy()
+    )
+
+    argument_comments = argument_comments[
+        argument_comments["comment"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+        .ne("")
+    ]
+
+    argument_comments.to_csv(
+        args.output_dir / "argument_comments.csv",
+        index=False,
+    )
+
+    response_lookup = build_column_lookup(responses.columns)
+    final_comment_col = find_column(
+        response_lookup,
+        "FINALCOMMENT",
+    )
+
+    response_id_col = next(
+        (
+            col
+            for col in responses.columns
+            if normalized_code(col) in {"RESPONSEID", "ID"}
+        ),
+        None,
+    )
+
+    if final_comment_col is not None:
+        final_feedback = pd.DataFrame(
+            {
+                "response_id": (
+                    responses[response_id_col]
+                    if response_id_col is not None
+                    else np.arange(1, len(responses) + 1)
+                ),
+                "final_feedback": responses[final_comment_col],
+            }
+        )
+
+        final_feedback = final_feedback[
+            final_feedback["final_feedback"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .ne("")
+        ]
+
+        final_feedback.to_csv(
+            args.output_dir / "final_feedback.csv",
+            index=False,
+        )
+
     participant_method, method_summary = build_method_summaries(
         ratings,
         args.output_dir,
