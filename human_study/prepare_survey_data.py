@@ -209,7 +209,7 @@ def apply_word_boundary_postprocessing(
     text,
     raw_spans,
     *,
-    drop_punctuation_only=True,
+    drop_punctuation_only=False,
 ):
     """
     Convert extracted spans to human-readable full-word spans.
