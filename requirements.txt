@@ -32,6 +32,10 @@ matplotlib==3.9.2
 shap==0.46.0
 captum==0.7.0
 
+# Evaluation
+scikit-learn==1.8.0
+krippendorff==0.7.3
+
 # Jupyter environment
 ipython==8.29.0
 ipykernel==6.29.5

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
+import krippendorff
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -364,6 +365,86 @@ def reshape_responses(
             )
 
     return ratings, rankings
+
+
+def compute_inter_rater_agreement(
+    ratings: pd.DataFrame,
+    output_dir: Path,
+):
+    agreement_rows = []
+
+    for metric in ("completeness", "precision"):
+        data = ratings[
+            [
+                "response_id",
+                "global_row_id",
+                "method_id",
+                metric,
+            ]
+        ].dropna(subset=[metric]).copy()
+
+        # One unit corresponds to one concrete explanation:
+        # argument × localization method.
+        data["unit_id"] = (
+            data["global_row_id"].astype(str)
+            + "__"
+            + data["method_id"].astype(str)
+        )
+
+        if data.duplicated(["response_id", "unit_id"]).any():
+            raise ValueError(
+                f"Duplicate ratings found for {metric}."
+            )
+
+        # Rows = participants, columns = explanation items.
+        matrix = data.pivot(
+            index="response_id",
+            columns="unit_id",
+            values=metric,
+        )
+
+        # Units rated by only one participant cannot contribute
+        # to inter-rater agreement.
+        ratings_per_unit = matrix.notna().sum(axis=0)
+        matrix = matrix.loc[:, ratings_per_unit >= 2]
+
+        alpha = krippendorff.alpha(
+            reliability_data=matrix.to_numpy(dtype=float),
+            level_of_measurement="ordinal",
+            value_domain=np.arange(
+                RATING_SCALE_MIN,
+                RATING_SCALE_MAX + 1,
+            ),
+        )
+
+        agreement_rows.append(
+            {
+                "metric": metric,
+                "krippendorff_alpha_ordinal": alpha,
+                "n_participants": matrix.shape[0],
+                "n_units": matrix.shape[1],
+                "n_ratings": int(matrix.notna().sum().sum()),
+                "mean_raters_per_unit": (
+                    matrix.notna()
+                    .sum(axis=0)
+                    .mean()
+                ),
+                "min_raters_per_unit": int(
+                    matrix.notna()
+                    .sum(axis=0)
+                    .min()
+                ),
+                "max_raters_per_unit": int(
+                    matrix.notna()
+                    .sum(axis=0)
+                    .max()
+                ),
+            }
+        )
+
+    agreement = pd.DataFrame(agreement_rows)
+
+    return agreement
 
 
 def mean_ci(values, confidence=0.95):
@@ -1000,6 +1081,15 @@ def main() -> None:
     rankings_path = args.output_dir / "argument_rankings_long.csv"
     ratings.to_csv(ratings_path, index=False)
     rankings.to_csv(rankings_path, index=False)
+
+    agreement = compute_inter_rater_agreement(
+        ratings,
+        args.output_dir,
+    )
+    agreement.to_csv(
+        args.output_dir / "inter_rater_agreement.csv",
+        index=False,
+    )
 
     argument_comments = (
         ratings[
