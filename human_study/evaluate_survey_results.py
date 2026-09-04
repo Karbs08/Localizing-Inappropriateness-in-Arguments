@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -18,6 +19,7 @@ HUMAN_STUDY_DIR = REPO_ROOT / "human_study"
 DEFAULT_MAPPING = HUMAN_STUDY_DIR / "survey_output" / "question_mapping.csv"
 DEFAULT_ARGUMENTS = HUMAN_STUDY_DIR / "survey_output" / "selected_arguments.csv"
 DEFAULT_ITEMS = HUMAN_STUDY_DIR / "survey_input" / "study_items.csv"
+DEFAULT_WORD_BOUNDARY_REPORT = HUMAN_STUDY_DIR / "survey_input" / "word_boundary_ratio_report.csv"
 DEFAULT_OUTPUT = HUMAN_STUDY_DIR / "survey_results"
 
 RATING_SCALE_MIN = 1
@@ -43,6 +45,12 @@ METHOD_LABELS = {
     "shap": "SHAP",
     "mil": "MIL",
     "llm": "LLM",
+}
+
+METRIC_COLORS = {
+    "completeness": "C0",
+    "precision": "C1",
+    "human_f1_like_1_7": "C2",
 }
 
 
@@ -86,6 +94,15 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Optional method whose spans are used as a reference for supplementary "
             "NER-style exact/partial span metrics. Use 'none' to disable."
+        ),
+    )
+    parser.add_argument(
+        "--word-boundary-report",
+        type=Path,
+        default=DEFAULT_WORD_BOUNDARY_REPORT,
+        help=(
+            "Word-boundary coverage report generated during survey preparation. "
+            "The selected_survey_arguments scope is used to obtain raw span coverage."
         ),
     )
     return parser.parse_args()
@@ -499,7 +516,83 @@ def holm_adjust(p_values):
     return adjusted
 
 
-def build_method_summaries(ratings: pd.DataFrame, output_dir: Path):
+def load_selected_method_coverage(
+    report_path: Path,
+) -> pd.DataFrame:
+    if not report_path.exists():
+        raise FileNotFoundError(
+            f"Word-boundary ratio report not found: {report_path}"
+        )
+
+    report = pd.read_csv(report_path)
+
+    required_columns = {
+        "scope",
+        "method_id",
+        "n_arguments",
+        "mean_masked_token_ratio_raw",
+    }
+    missing_columns = required_columns - set(report.columns)
+
+    if missing_columns:
+        raise KeyError(
+            "Missing required columns in word-boundary ratio report: "
+            f"{sorted(missing_columns)}"
+        )
+
+    coverage = report[
+        report["scope"] == "selected_survey_arguments"
+    ].copy()
+
+    coverage["method_id"] = coverage["method_id"].astype(str)
+
+    if coverage.empty:
+        raise ValueError(
+            "No rows with scope='selected_survey_arguments' "
+            "found in word-boundary ratio report."
+        )
+
+    if coverage["method_id"].duplicated().any():
+        duplicates = coverage.loc[
+            coverage["method_id"].duplicated(keep=False),
+            "method_id",
+        ].tolist()
+        raise ValueError(
+            "Duplicate method rows in selected survey coverage: "
+            f"{duplicates}"
+        )
+
+    missing_methods = [
+        method
+        for method in METHOD_ORDER
+        if method not in set(coverage["method_id"])
+    ]
+    if missing_methods:
+        raise ValueError(
+            "Missing methods in selected survey coverage: "
+            f"{missing_methods}"
+        )
+
+    coverage = coverage[
+        [
+            "method_id",
+            "n_arguments",
+            "mean_masked_token_ratio_raw",
+        ]
+    ].rename(
+        columns={
+            "n_arguments": "coverage_n_arguments",
+        }
+    )
+
+    return coverage
+
+
+def build_method_summaries(
+    ratings: pd.DataFrame,
+    method_coverage: pd.DataFrame,
+    output_dir: Path,
+):
     metrics = (
         "completeness",
         "precision",
@@ -519,18 +612,22 @@ def build_method_summaries(ratings: pd.DataFrame, output_dir: Path):
         ]
         .mean()
     )
+
     participant_method.to_csv(
         output_dir / "participant_method_means.csv",
         index=False,
     )
 
     summary_rows = []
+
     for method in METHOD_ORDER:
         method_df = participant_method[
             participant_method["method_id"] == method
         ]
+
         for metric in metrics:
             result = mean_ci(method_df[metric])
+
             summary_rows.append(
                 {
                     "method_id": method,
@@ -541,12 +638,53 @@ def build_method_summaries(ratings: pd.DataFrame, output_dir: Path):
             )
 
     method_summary = pd.DataFrame(summary_rows)
+
+    # Add raw span coverage to each method-level summary row.
+    method_summary = method_summary.merge(
+        method_coverage,
+        on="method_id",
+        how="left",
+        validate="many_to_one",
+    )
+
     method_summary.to_csv(
         output_dir / "method_summary.csv",
         index=False,
     )
 
-    return participant_method, method_summary
+    # Dedicated one-row-per-method table for relating human scores
+    # to the amount of selected text.
+    score_coverage_summary = (
+        participant_method
+        .groupby("method_id", as_index=False)
+        .agg(
+            completeness_mean=("completeness", "mean"),
+            precision_mean=("precision", "mean"),
+            human_f1_like_mean=("human_f1_like", "mean"),
+            human_f1_like_1_7_mean=("human_f1_like_1_7", "mean"),
+        )
+        .merge(
+            method_coverage,
+            on="method_id",
+            how="left",
+            validate="one_to_one",
+        )
+        .set_index("method_id")
+        .reindex(METHOD_ORDER)
+        .reset_index()
+    )
+
+    score_coverage_summary["method"] = (
+        score_coverage_summary["method_id"]
+        .map(METHOD_LABELS)
+    )
+
+    score_coverage_summary.to_csv(
+        output_dir / "method_score_coverage_summary.csv",
+        index=False,
+    )
+
+    return participant_method, method_summary, score_coverage_summary
 
 
 def build_pairwise_ranking(ratings: pd.DataFrame, output_dir: Path):
@@ -647,9 +785,15 @@ def exploratory_repeated_measures(
         )
 
         complete = pivot.dropna()
-        if len(complete) >= 2:
+        n_participants = len(complete)
+        n_methods = len(METHOD_ORDER)
+        if n_participants >= 2:
             result = stats.friedmanchisquare(
                 *[complete[method].values for method in METHOD_ORDER]
+            )
+            kendalls_w = (
+                result.statistic
+                / (n_participants * (n_methods - 1))
             )
             friedman_rows.append(
                 {
@@ -657,6 +801,7 @@ def exploratory_repeated_measures(
                     "n_participants": len(complete),
                     "friedman_chi2": result.statistic,
                     "p_value": result.pvalue,
+                    "kendalls_w": kendalls_w,
                 }
             )
         else:
@@ -666,6 +811,7 @@ def exploratory_repeated_measures(
                     "n_participants": len(complete),
                     "friedman_chi2": np.nan,
                     "p_value": np.nan,
+                    "kendalls_w": np.nan,
                 }
             )
 
@@ -915,40 +1061,192 @@ def compute_entity_metrics(
     )
 
 
+def create_score_coverage_plots(
+    score_coverage_summary: pd.DataFrame,
+    figure_dir: Path,
+):
+    plot_specs = [
+        (
+            "completeness_mean",
+            "Completeness",
+            (1, 7),
+            "masked_token_ratio_vs_completeness.png",
+        ),
+        (
+            "precision_mean",
+            "Precision",
+            (1, 7),
+            "masked_token_ratio_vs_precision.png",
+        ),
+        (
+            "human_f1_like_mean",
+            r"$F_{\mathrm{human}}$",
+            (0, 1),
+            "masked_token_ratio_vs_human_f1_like.png",
+        ),
+    ]
+
+    for metric, ylabel, ylim, filename in plot_specs:
+        fig, ax = plt.subplots(figsize=(7, 5.5))
+
+        x = score_coverage_summary[
+            "mean_masked_token_ratio_raw"
+        ].to_numpy(dtype=float)
+
+        y = score_coverage_summary[
+            metric
+        ].to_numpy(dtype=float)
+
+        ax.scatter(x, y)
+
+        for _, row in score_coverage_summary.iterrows():
+            ax.annotate(
+                row["method"],
+                (
+                    row["mean_masked_token_ratio_raw"],
+                    row[metric],
+                ),
+                xytext=(5, 5),
+                textcoords="offset points",
+                fontsize=9,
+            )
+
+        ax.set_xlabel("Mean proportion of selected tokens")
+        ax.set_ylabel(ylabel)
+        ax.set_ylim(*ylim)
+
+        ax.xaxis.set_major_formatter(
+            PercentFormatter(xmax=1.0)
+        )
+
+        ax.grid(
+            axis="both",
+            alpha=0.25,
+        )
+
+        fig.tight_layout()
+
+        fig.savefig(
+            figure_dir / filename,
+            dpi=300,
+            bbox_inches="tight",
+        )
+
+        plt.close(fig)
+
+
+def create_combined_score_coverage_plot(
+    score_coverage_summary: pd.DataFrame,
+    figure_dir: Path,
+):
+    plot_metrics = [
+        (
+            "completeness_mean",
+            "Completeness",
+            "completeness",
+        ),
+        (
+            "precision_mean",
+            "Precision",
+            "precision",
+        ),
+        (
+            "human_f1_like_1_7_mean",
+            "F1-like balanced quality",
+            "human_f1_like_1_7",
+        ),
+    ]
+
+    fig, ax = plt.subplots(figsize=(8.5, 6.5))
+
+    for metric_col, label, color_key in plot_metrics:
+        x = score_coverage_summary["mean_masked_token_ratio_raw"].to_numpy(dtype=float)
+        y = score_coverage_summary[metric_col].to_numpy(dtype=float)
+
+        ax.scatter(
+            x,
+            y,
+            label=label,
+            color=METRIC_COLORS[color_key],
+            s=55,
+            alpha=0.9,
+        )
+
+        for _, row in score_coverage_summary.iterrows():
+            ax.annotate(
+                row["method"],
+                (
+                    row["mean_masked_token_ratio_raw"],
+                    row[metric_col],
+                ),
+                xytext=(5, 5),
+                textcoords="offset points",
+                fontsize=8,
+                color=METRIC_COLORS[color_key],
+            )
+
+    ax.set_xlabel("Mean proportion of selected tokens")
+    ax.set_ylabel("Mean participant-level score")
+    ax.set_ylim(1, 7)
+    ax.xaxis.set_major_formatter(PercentFormatter(xmax=1.0))
+    ax.grid(axis="both", alpha=0.25)
+    ax.legend()
+    fig.tight_layout()
+
+    fig.savefig(
+        figure_dir / "masked_token_ratio_vs_scores_combined.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close(fig)
+
+
 def create_plots(
     participant_method: pd.DataFrame,
     method_summary: pd.DataFrame,
+    score_coverage_summary: pd.DataFrame,
     pairwise_matrix: pd.DataFrame,
     output_dir: Path,
 ):
     figure_dir = output_dir / "figures"
     figure_dir.mkdir(parents=True, exist_ok=True)
 
+    create_score_coverage_plots(
+        score_coverage_summary,
+        figure_dir,
+    )
+
+    create_combined_score_coverage_plot(
+        score_coverage_summary,
+        figure_dir,
+    )
+
     # Completeness, precision, and the exploratory harmonic composite.
     plot_metrics = [
-        ("completeness", "Completeness", (1, 7)),
-        ("precision", "Precision", (1, 7)),
-        ("human_f1_like_1_7", "F1-like balanced quality", (1, 7)),
+        ("completeness", "Completeness", (1, 7), "completeness"),
+        ("precision", "Precision", (1, 7), "precision"),
+        ("human_f1_like_1_7", "F1-like balanced quality", (1, 7), "human_f1_like_1_7"),
     ]
 
-    grouped = []
-    for method in METHOD_ORDER:
-        method_df = participant_method[
-            participant_method["method_id"] == method
-        ]
-        row = {"method": METHOD_LABELS.get(method, method)}
-        for metric, _, _ in plot_metrics:
-            row[metric] = method_df[metric].mean()
-        grouped.append(row)
     grouped = pd.DataFrame(grouped)
-
     x = np.arange(len(grouped))
     width = 0.25
     plt.figure(figsize=(13, 6))
-    for i, (metric, label, _) in enumerate(plot_metrics):
+    for i, (metric, label, _, color_key) in enumerate(plot_metrics):
         offset = (i - 1) * width
-        plt.bar(x + offset, grouped[metric], width=width, label=label)
-    plt.xticks(x, grouped["method"], rotation=20, ha="right")
+        plt.bar(
+            x + offset,
+            grouped[metric],
+            width=width,
+            label=label,
+            color=METRIC_COLORS[color_key],
+        )
+    plt.xticks(
+        x,
+        grouped["method"],
+        rotation=20,
+        ha="right",
+    )
     plt.ylim(1, 7)
     plt.ylabel("Mean participant-level score")
     plt.xlabel("Method")
@@ -1163,8 +1461,12 @@ def main() -> None:
             index=False,
         )
 
-    participant_method, method_summary = build_method_summaries(
+    method_coverage = load_selected_method_coverage(
+        args.word_boundary_report,
+    )
+    participant_method, method_summary, score_coverage_summary = build_method_summaries(
         ratings,
+        method_coverage,
         args.output_dir,
     )
     _, pairwise_matrix = build_pairwise_ranking(
@@ -1178,6 +1480,7 @@ def main() -> None:
     create_plots(
         participant_method,
         method_summary,
+        score_coverage_summary,
         pairwise_matrix,
         args.output_dir,
     )
