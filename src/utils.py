@@ -780,3 +780,59 @@ def save_aopc_outputs(
         print(path)
 
     return paths
+
+
+def mark_pareto_efficient(
+    df,
+    drop_col="mean_prob_drop",
+    pdr_col="positive_drop_rate",
+    mtr_col="mean_masked_token_ratio",
+    tol=1e-12,
+):
+    """
+    Returns a copy of df with:
+      - pareto_efficient: whether the configuration is non-dominated
+      - dominated_by: indices of configurations that dominate it
+
+    Objectives:
+      mean_prob_drop: maximize
+      PDR: maximize
+      mean_masked_token_ratio: minimize
+    """
+
+    out = df.copy()
+
+    drops = out[drop_col].to_numpy(dtype=float)
+    pdrs = out[pdr_col].to_numpy(dtype=float)
+    mtrs = out[mtr_col].to_numpy(dtype=float)
+
+    pareto = np.ones(len(out), dtype=bool)
+    dominated_by = [[] for _ in range(len(out))]
+
+    for i in range(len(out)):
+        for j in range(len(out)):
+            if i == j:
+                continue
+
+            # j is at least as good as i in all three objectives
+            at_least_as_good = (
+                drops[j] >= drops[i] - tol
+                and pdrs[j] >= pdrs[i] - tol
+                and mtrs[j] <= mtrs[i] + tol
+            )
+
+            # j is strictly better in at least one objective
+            strictly_better = (
+                drops[j] > drops[i] + tol
+                or pdrs[j] > pdrs[i] + tol
+                or mtrs[j] < mtrs[i] - tol
+            )
+
+            if at_least_as_good and strictly_better:
+                pareto[i] = False
+                dominated_by[i].append(out.index[j])
+
+    out["pareto_efficient"] = pareto
+    out["dominated_by"] = dominated_by
+
+    return out
