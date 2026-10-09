@@ -1,575 +1,195 @@
-# From Document to Span: Localizing Inappropriateness in Arguments
+# From Document to Span: Localizing Reasons for Inappropriateness in Arguments
 
-This repository contains the experimental code for localizing the textual evidence behind document-level predictions of **inappropriateness in arguments**.
+This repository contains the experimental code for Karsten Bruns's master's thesis on localizing evidence for **inappropriateness in arguments** under weak supervision.
 
-The project starts from a pretrained binary appropriateness classifier that predicts whether an entire argument is appropriate or inappropriate. Its central question is more fine-grained:
+Starting from a fixed document-level appropriateness classifier, the project asks:
 
-> **Which words or text spans caused, supported, or best explain the classifier's prediction that an argument is inappropriate?**
+> Which text spans support an inappropriate-class prediction, and how do their influence on the classifier and their human-perceived explanation quality compare?
 
-Because the underlying corpus provides document-level labels but no human-annotated rationale spans, the project studies span localization under **weak supervision**. It compares post-hoc attribution methods, lexical and random baselines, and a Multiple Instance Learning approach. The extracted spans are evaluated through classifier perturbations, comparison with LLM-generated silver-reference spans, and a LimeSurvey-based human evaluation.
+The Appropriateness Corpus provides document-level labels but no gold rationale spans. The experiments therefore compare Random and TF-IDF baselines, Attention, Integrated Gradients, SHAP, and Multiple Instance Learning (MIL) without supervised span annotations. Evaluation combines masking-based classifier perturbations, ranking faithfulness, overlap with an LLM-generated silver reference, and a completed human study.
 
-> **Project status:** Work in progress. The core localization methods and the automated LimeSurvey human-study generation pipeline are implemented. Some cross-method evaluation results, the deployment and analysis of the human study, and the consolidated result reporting are still being completed.
-
----
+**Status:** The experiments, comparative evaluation, and human study reported in the thesis are complete. This README describes the thesis protocol and the repository layout. The thesis is the authoritative source for the experimental findings.
 
 ## Contents
 
-- [Research context](#research-context)
 - [Dataset and classifier](#dataset-and-classifier)
-- [Task formulation](#task-formulation)
-- [Localization methods](#localization-methods)
-- [Experimental workflow](#experimental-workflow)
-- [Evaluation](#evaluation)
+- [Experimental protocol](#experimental-protocol)
+- [Localization methods and final configurations](#localization-methods-and-final-configurations)
+- [Evaluation and main findings](#evaluation-and-main-findings)
 - [Repository structure](#repository-structure)
-- [Installation](#installation)
-- [Makefile workflow](#makefile-workflow)
-- [Google Gemini API setup](#google-gemini-api-setup)
+- [What runs where and where results are written](#what-runs-where-and-where-results-are-written)
+- [Installation and Makefile workflow](#installation-and-makefile-workflow)
 - [Data preparation](#data-preparation)
-- [Running the notebooks](#running-the-notebooks)
-- [Human study generation](#human-study-generation)
-- [Reproducibility](#reproducibility)
-- [Current status](#current-status)
-- [Limitations](#limitations)
-- [Citation](#citation)
-- [References](#references)
-
----
-
-## Research context
-
-This work builds directly on:
-
-> Timon Ziegenbein, Shahbaz Syed, Felix Lange, Martin Potthast, and Henning Wachsmuth.  
-> **[Modeling Appropriate Language in Argumentation](https://aclanthology.org/2023.acl-long.238/).**  
-> ACL 2023, pages 4344–4363.
-
-Ziegenbein et al. operationalize appropriateness in online argumentation through a hierarchical taxonomy of inappropriate language. Their taxonomy contains four core dimensions:
-
-- **Toxic Emotions**
-- **Missing Commitment**
-- **Missing Intelligibility**
-- **Other Reasons**
-
-These are further decomposed into more specific dimensions such as excessive intensity, emotional deception, missing seriousness, missing openness, unclear meaning, missing relevance, confusing reasoning, and detrimental orthography.
-
-The original work establishes and predicts appropriateness at the **argument level**. This repository takes the next step from document-level assessment to **span-level localization**. Rather than only asking whether an argument is inappropriate, it investigates which parts of the argument contain evidence relevant to that prediction.
-
-This repository does not retrain or replace the original binary classifier as its primary task. Instead, the classifier is treated as a fixed document-level model whose predictions are analyzed and localized.
-
----
+- [Running the experiments](#running-the-experiments)
+- [Gemini silver-reference setup](#gemini-silver-reference-setup)
+- [Human study](#human-study)
+- [Reproducibility and limitations](#reproducibility-and-limitations)
+- [Citation and references](#citation-and-references)
 
 ## Dataset and classifier
 
 ### Appropriateness Corpus
 
-The experiments use the official Hugging Face version of the **Appropriateness Corpus**:
+The experiments use [timonziegenbein/appropriateness-corpus](https://huggingface.co/datasets/timonziegenbein/appropriateness-corpus), introduced by Ziegenbein et al. in [Modeling Appropriate Language in Argumentation](https://aclanthology.org/2023.acl-long.238/) (ACL 2023).
 
-- **Dataset:** [timonziegenbein/appropriateness-corpus](https://huggingface.co/datasets/timonziegenbein/appropriateness-corpus)
-- **Original paper:** [Modeling Appropriate Language in Argumentation](https://aclanthology.org/2023.acl-long.238/)
-- **Original project repository:** [timonziegenbein/appropriateness-corpus](https://github.com/timonziegenbein/appropriateness-corpus)
+The corpus contains **2,191 English arguments** on **1,154 issues**: 1,590 debate-portal arguments, 500 question-answering forum arguments, and 101 reviews. The original splits are preserved.
 
-The corpus contains **2,191 English arguments** on **1,154 issues**, compiled from three argument-quality corpora and three argumentative genres:
+| Split | Arguments | TP | TN | FP | FN |
+|---|---:|---:|---:|---:|---:|
+| Train | 1,533 | 785 | 652 | 48 | 48 |
+| Validation | 220 | 88 | 66 | 30 | 36 |
+| Test | 438 | 186 | 142 | 71 | 39 |
 
-- 1,590 arguments from debate portals
-- 500 arguments from question-answering forums
-- 101 reviews
+Confusion types are determined from the corpus's binary document label and the fixed classifier's prediction. A **true positive (TP)** is an argument labeled inappropriate that the classifier also predicts as inappropriate.
 
-The Hugging Face dataset provides the following predefined splits:
+Relevant corpus fields are `post_id`, `issue`, `post_text`, the binary `Inappropriateness` label, and the document-level taxonomy labels. The taxonomy distinguishes Toxic Emotions, Missing Commitment, Missing Intelligibility, and Other Reasons, with finer dimensions beneath them. The corpus contains **no gold token-level or character-level rationale annotations**. The experiments localize evidence for the binary label; they do not train a span-level taxonomy classifier.
 
-| Split | Arguments |
-|---|---:|
-| Train | 1,533 |
-| Validation | 220 |
-| Test | 438 |
-| **Total** | **2,191** |
+### Fixed document-level classifier
 
-Relevant columns include:
+The original classifier is [timonziegenbein/appropriateness-classifier-binary](https://huggingface.co/timonziegenbein/appropriateness-classifier-binary), a **DeBERTaV3-based** model released with the corpus.
 
-| Column | Description |
-|---|---|
-| `post_id` | Identifier of the argument |
-| `issue` | Issue or topic discussed by the argument |
-| `post_text` | Full argument text |
-| `Inappropriateness` | Binary document-level inappropriateness label |
-| taxonomy columns | Binary labels for the finer-grained inappropriateness dimensions |
+- `LABEL_0`: appropriate.
+- `LABEL_1`: inappropriate.
+- The fixed classifier receives the normalized argument text only, derived from `post_text`.
+- Its maximum input length is **512 model tokens**.
+- The issue is retained as metadata and is provided separately to MIL and the LLM annotator. It is not prepended to the fixed classifier's input.
 
-The corpus contains document-level annotations. It does **not** contain gold character offsets or token-level rationale annotations for the inappropriate parts of an argument. This absence of gold spans motivates the weakly supervised setup used in this project.
+The inappropriate-class probability is denoted by $p_1(x)=P(y=1\mid x)$. The original classifier is used to obtain document predictions and to evaluate selected evidence by rerunning it on perturbed arguments. It is not retrained in these experiments. MIL learns a separate prediction function and is evaluated separately at bag level.
 
-### Binary appropriateness classifier
+## Experimental protocol
 
-The experiments use the binary classifier released with the corpus:
+### 1. Prepare a shared dataset
 
-- **Model:** [timonziegenbein/appropriateness-classifier-binary](https://huggingface.co/timonziegenbein/appropriateness-classifier-binary)
+`src/prepare_data.py` creates one canonical dataset for all experiments. It preserves the official splits, applies **NFKC Unicode normalization** and collapses consecutive whitespace, while preserving capitalization and punctuation. It stores the result as `text_norm`, assigns stable `global_row_id` identifiers, and computes original classifier probabilities, predictions, and confusion types.
 
-The Hugging Face model card describes the model as a DeBERTa-v2-based text classifier that distinguishes:
+All method outputs use character intervals in this shared normalized text. Offsets must be interpreted against `text_norm`, rather than an independently normalized copy or the original unnormalized text. Spans use start and exclusive end positions. Invalid intervals are discarded and overlapping intervals are merged before common evaluation.
 
-- `LABEL_0`: appropriate
-- `LABEL_1`: inappropriate
+### 2. Select the perturbation operator before method configuration
 
-In this project, the probability assigned to `LABEL_1` is denoted by:
+`evaluation/mask_vs_delete.ipynb` performs a **preliminary paired ablation on the 88 validation true positives**. It compares masking and deletion using five heterogeneous span sources: Random, Attention, two SHAP masker variants, and a lightweight MIL model. These are preliminary configurations, not the final method outputs, and the LLM reference is not part of this operator-selection experiment.
 
-$$
-p_{\mathrm{inappropriate}}(x) = P(y=\mathrm{inappropriate}\mid x)
-$$
+For each argument and source, the spans remain identical under both operators. **Masking is selected** because it produces more consistent positive drops across the investigated conditions and preserves surrounding sequence structure. It does not maximize the arithmetic mean drop in every condition.
 
-All predictions of the original document-level classifier use the argument text, `post_text`, as input. The issue is retained as metadata and may be used by separate experimental components, such as the MIL span encoder, but it is not added to the input of the original binary classifier.
+All subsequent configuration searches and final perturbation evaluations use masking. Every non-special classifier token whose character interval overlaps selected evidence is replaced by one tokenizer-specific mask token. Selected multi-token regions are not collapsed into a single placeholder. Multiple spans are perturbed jointly from the original input.
 
-The model is used for two purposes:
+### 3. Select configurations on development data
 
-1. establishing the original document-level prediction and its probability;
-2. evaluating extracted spans by masking or deleting them and running the classifier again.
+Random, TF-IDF, Attention, Integrated Gradients, and SHAP select their final span configurations on **873 development true positives**: 785 from train and 88 from validation. The TF-IDF vectorizer is fitted on all **1,753 train and validation texts**, independently of the TP subset used to select span parameters.
 
----
+MIL is the exception: its models are trained on all **1,533 training arguments**, with document labels only. Each configuration retains the checkpoint with the highest validation F1. After bag-level validity checks, its localization configuration is selected on the **88 validation true positives of the original classifier**.
 
-## Task formulation
+Configuration selection follows the common thesis rule:
 
-Let an argument be represented by $x$, and let the fixed document-level classifier be $f$. The classifier returns the probability of the inappropriate class:
+1. Exclude configurations with a **mean masked-token ratio greater than 0.65**.
+2. Compute within-method percentile ranks for mean probability drop, positive drop rate, and compactness; lower token coverage receives a higher compactness rank.
+3. Select the eligible configuration with the highest weighted score:
 
 $$
-f_1(x) = P(y=1\mid x)
+S(c)=0.4\,r_{\Delta p}(c)+0.4\,r_{\mathrm{PDR}}(c)+0.2\,r_{\mathrm{compact}}(c).
 $$
 
-The span-localization task is to identify one or more spans:
+The selected configuration is additionally checked for Pareto optimality across these three criteria. Median drops, variability, and qualitative examples support analysis but are not additional terms in the selection score. AOPC is a separate ranking diagnostic and **does not enter configuration selection**. The 0.65 limit applies to the development-set mean, not to every individual explanation or to a test-time clipping rule.
 
-$$
-S = \{s_1, s_2, \ldots, s_k\}
-$$
+### 4. Freeze configurations and evaluate held-out outputs
 
-that capture evidence relevant to the model's prediction that $x$ is inappropriate.
+One configuration per method is fixed before test evaluation. The complete test set contains **438 arguments**; the primary localization analysis uses its **186 true positives**. The LLM comparison uses a fixed random subset of **100 test true positives**. LLM annotations are generated for final evaluation only and are not used to tune the six localization approaches.
 
-The task differs from conventional supervised rationale extraction because there are no gold rationale spans available for training. The methods instead use one or more of the following signals:
+Argument-level exports retain selected spans and original/perturbed classifier outputs. Span-level exports retain individual localized regions. `global_row_id` links all method, reference, and study outputs.
 
-- internal classifier representations;
-- feature-attribution scores;
-- lexical salience;
-- changes in classifier output after perturbation;
-- document-level labels;
-- LLM-generated silver-reference spans.
+## Localization methods and final configurations
 
-The extracted spans should ideally be:
+| Approach | Localization signal | Final thesis configuration | Additional model training |
+|---|---|---|---|
+| Random | Uniformly sampled word positions | `multi_word_budgeted`, word budget `25` | No |
+| TF-IDF | Lexical term scores | `top_k=8`, word context window `2` | No |
+| Attention | Classification-token attention rollout | `rollout`, `quantile=0.40`, merge gap `0` | No |
+| Integrated Gradients | Positive attributions for `LABEL_1` | `quantile=0.40`, merge gap `3` | No |
+| SHAP | Positive segment attributions for `LABEL_1` | `quantile=0.50`, segment context window `0` | No |
+| MIL | Learned candidate-span instance probabilities | `pool=topk_noisy_or`, `topk=3`, `spans=15`, `stride=4`, `freeze=True` | Yes |
+| LLM silver reference | Prompted verbatim span annotation | `gemini-3-flash-preview`, temperature `0` | External annotation |
 
-- **relevant**, by pointing to content connected to inappropriateness;
-- **faithful**, by affecting the classifier when perturbed;
-- **concise**, by avoiding unnecessary surrounding text;
-- **sufficient**, by retaining enough evidence to understand the prediction;
-- **interpretable**, by forming readable text spans rather than isolated tokenizer artifacts.
+The LLM is an external reference condition, not a seventh primary localization method or human gold standard. Window parameters have different meanings across methods and are not interchangeable.
 
----
+### Random and TF-IDF baselines
 
-## Localization methods
+Random compares one contiguous word span with distributed word-budget selection. Distributed selection samples distinct word positions without replacement and merges adjacent selections. Every development configuration uses five reproducible draws per argument, averaged within the argument before aggregation. Final test evaluation retains **one reproducible draw per argument**, without choosing the best draw.
 
-The repository compares six primary localization approaches. LLM-generated spans are handled separately as a silver reference and are not treated as human gold annotations.
+TF-IDF uses lowercased unigrams, English stop-word removal, sublinear term frequency, and L2 normalization, with `min_df=1` and `max_df=1.0`. Every occurrence of a selected term is an anchor. Each anchor receives symmetric word-context expansion, and overlapping or adjacent regions are merged. The development-fitted vectorizer is only transformed on the test set.
 
-### Method overview
+### Attention
 
-| Method | Category | Main localization signal | Requires additional training |
-|---|---|---|---:|
-| Random spans | Baseline | Randomly sampled words or contiguous spans | No |
-| TF-IDF | Lexical baseline | Argument-specific TF-IDF scores | No |
-| SHAP | Post-hoc attribution | Positive SHAP values for `LABEL_1` | No |
-| Integrated Gradients | Gradient-based attribution | Positive input attributions for `LABEL_1` | No |
-| Attention | Internal model signal | Classification-token attention or attention rollout | No |
-| Multiple Instance Learning | Weakly supervised learning | Learned latent span-instance scores | Yes |
-| LLM spans | **Silver reference** | LLM-generated textual rationales | External annotation only |
+The notebook compares `last_cls` with `rollout`. `last_cls` averages final-layer attention across heads and uses the classification-token row. Rollout averages heads within each layer, adds identity matrices for residual connections, normalizes rows, and composes attention across layers.
 
-### Random span baseline
-
-The random baseline does not use model attributions, gradients, attention weights, labels, or lexical importance. It selects spans randomly and measures how much perturbing them changes the inappropriate-class probability.
-
-Two selection strategies are investigated:
-
-- `single_contiguous`: select one contiguous random word span;
-- `multi_word_budgeted`: sample a fixed word budget and merge adjacent selected words into spans.
-
-During configuration search, several random samples are drawn for each argument and configuration. Their means and standard deviations estimate the variability of random selection. For the final test evaluation, exactly one concrete random sample is retained per argument. This avoids selecting the best random sample after observing the result and ensures that each row corresponds to a unique set of spans.
-
-The random baseline is essential for determining whether an attribution method performs better than perturbing arbitrary parts of an argument.
-
-### TF-IDF baseline
-
-The TF-IDF baseline provides a simple lexical notion of salience that is independent of the classifier's internal representations.
-
-A `TfidfVectorizer` is fitted on the development data only. For each argument, the highest-scoring terms are selected, located in the original text, and expanded or merged into readable spans. The main configuration parameters are:
-
-- the number of selected terms, `top_k`;
-- the local `window_size` used to expand or merge evidence.
-
-The final vectorizer is fitted on the development set and only transformed on the held-out test set. The test data is not used to learn the TF-IDF vocabulary or select the configuration.
-
-TF-IDF is not expected to provide a faithful explanation of the classifier by itself. It serves as a transparent lexical baseline for assessing whether model-aware methods outperform generic term salience.
-
-### SHAP
-
-The SHAP approach applies local feature attribution to the binary classifier using the SHAP Transformers integration.
-
-Reference:
-
-- Scott M. Lundberg and Su-In Lee. [A Unified Approach to Interpreting Model Predictions](https://proceedings.neurips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html). NeurIPS 2017.
-
-SHAP produces a signed contribution score for each text segment. This project focuses on **positive attributions for `LABEL_1`**, because the objective is to identify evidence that supports the inappropriate prediction rather than evidence that opposes it.
-
-The extraction procedure is:
-
-1. compute SHAP values for the inappropriate-class output;
-2. retain positively contributing segments;
-3. select the strongest segments using a quantile threshold;
-4. optionally merge nearby segments using a window parameter;
-5. convert the selected segments to character-level spans;
-6. perturb all selected spans together;
-7. measure the change in the classifier output.
-
-The main tuned parameters are:
-
-- `quantile`;
-- `window_size`.
-
-Higher quantiles generally produce shorter, more selective explanations. Lower quantiles retain more evidence but may include irrelevant content.
+Localization operates on valid **model tokens**. A per-argument quantile selects tokens; a merge gap joins selections separated by at most the specified number of unselected tokens and includes the intervening region. Attention is used as a candidate-localization signal, not assumed to be an explanation by itself.
 
 ### Integrated Gradients
 
-Integrated Gradients is implemented with Captum's `LayerIntegratedGradients`.
+Captum's `LayerIntegratedGradients` attributes the inappropriate-class output at the classifier's embedding layer. The baseline preserves special tokens and replaces ordinary tokens with the padding token when available, otherwise the mask or unknown token. The experiment uses **16 integration steps** and internal batch size **4**.
 
-Reference:
+Embedding-dimension attributions are summed to one signed score per model token and normalized by the sum of absolute scores. Only positive scores are eligible for final selection. Quantile selection and gap-based merging operate directly on **model tokens**, without first aggregating subwords to words. Expansion to complete words is applied separately for human-study presentation.
 
-- Mukund Sundararajan, Ankur Taly, and Qiqi Yan. [Axiomatic Attribution for Deep Networks](https://proceedings.mlr.press/v70/sundararajan17a.html). ICML 2017.
+### SHAP
 
-The method computes gradients for the inappropriate target class along a path from a reference input to the observed input. Subword-level attributions are aggregated to words before spans are constructed.
+The SHAP implementation wraps the Hugging Face classifier with `shap.models.TransformersPipeline`. An explicit text masker uses the classifier's mask token with `collapse_mask_token=False`. Automatic algorithm selection resolves to `PartitionExplainer` in this setup. Explanations target `LABEL_1`, use batch size **8**, and are cached per argument.
 
-The extraction procedure is:
-
-1. compute token-level Integrated Gradients for `LABEL_1`;
-2. aggregate subword contributions to word-level scores;
-3. retain positive word attributions;
-4. select high-attribution words using a quantile;
-5. merge nearby selected words using a configurable gap;
-6. evaluate the resulting spans through perturbation.
-
-The main tuned parameters are:
-
-- `quantile`;
-- `window_size`.
-
-Because attribution scores are aggregated to complete words before span creation, the resulting explanations are less prone to isolated subword fragments.
-
-### Attention-based localization
-
-The attention approach derives candidate spans from internal attention distributions of the classifier.
-
-Two aggregation strategies are investigated:
-
-- `last_cls`: attention from the classification token to input tokens in the final transformer layer, averaged across heads;
-- `rollout`: attention propagated across layers using normalized attention matrices and residual connections.
-
-References:
-
-- Sarthak Jain and Byron C. Wallace. [Attention is not Explanation](https://aclanthology.org/N19-1357/). NAACL 2019.
-- Samira Abnar and Willem Zuidema. [Quantifying Attention Flow in Transformers](https://aclanthology.org/2020.acl-main.385/). ACL 2020.
-
-Attention weights are **not assumed to be faithful explanations by themselves**. They are used only as a signal for generating candidate spans. The selected spans are subsequently evaluated by perturbing the input and observing the classifier response.
-
-The workflow includes:
-
-1. extract token-level attention scores;
-2. select high-attention tokens by quantile;
-3. merge nearby selected tokens;
-4. expand spans to readable word boundaries;
-5. remove punctuation-only artifacts;
-6. validate the spans through classifier perturbation.
-
-This post-processing is important because raw tokenizer offsets may otherwise produce fragments such as punctuation marks or incomplete subwords.
+Positive segment attributions are thresholded using a per-argument quantile. The context window expands selected segments by neighboring SHAP segments. Resulting intervals are merged, and empty or punctuation-only regions are discarded. The final configuration adds no segment context.
 
 ### Multiple Instance Learning
 
-Multiple Instance Learning is the only primary method in this repository that trains an additional model specifically for span localization.
+MIL treats documents as bags of candidate word spans and learns from document labels only. Each candidate is paired with the discussion issue; only the candidate's argument-text interval is returned as evidence and perturbed later. The classifier encoder is frozen and a new linear instance head is trained. Instance probabilities are aggregated using max, top-k mean, or top-k noisy-or pooling.
 
-Each argument is represented as a **bag**, while automatically generated candidate spans are treated as latent **instances**:
+`mil_spans.ipynb` performs the coarse search over grouped candidate lengths; `mil_spans_singles.ipynb` performs the refined search over individual lengths. The thesis reports **42 coarse** and **70 refined** configurations. The final configuration comes from the refined search.
 
-$$
-B_i = \{s_{i1}, s_{i2}, \ldots, s_{im}\}
-$$
+Candidates contain at least two words, with at most **80 candidates per argument** and maximum issue–span input length **96 model tokens**. Training uses three epochs, bag batch size one, learning rate `1e-3`, weight decay `0.01`, and gradient clipping at `1.0`. Selection requires validation AUROC of at least `0.55` and prediction standard deviation of at least `0.02` before the common localization score is applied.
 
-Only the argument-level label is observed. The model learns instance scores and aggregates them into a bag-level prediction.
+The **three highest-scoring candidates** form the final explanation, with overlaps merged. Pooling `topk` controls bag prediction; the number of candidates retained for the explanation is a separate setting, although both equal three in the final configuration. Bag classification quality and the influence of the selected spans on the original classifier are evaluated separately.
 
-Candidate spans are generated as sliding word windows. Their granularity and density are controlled through:
+## Evaluation and main findings
 
-- candidate span length;
-- stride;
-- maximum number of candidates.
+### Perturbation and compactness
 
-The MIL encoder receives the discussion issue and a candidate span. Including the issue gives the span model access to context that may be required for dimensions such as missing relevance.
-
-Several pooling strategies are explored:
-
-- max pooling;
-- top- $k$ mean pooling;
-- top- $k$ noisy-or pooling.
-
-After training, the highest-ranked candidate spans are selected and evaluated against the **original Ziegenbein classifier** using the same perturbation protocol as the post-hoc methods.
-
-MIL therefore has two distinct evaluation levels:
-
-1. **bag-level classification quality**, which tests whether the MIL model learns the document-level task;
-2. **span-level perturbation behavior**, which tests whether its selected spans affect the original classifier.
-
-Good bag-level performance does not automatically imply that the localized spans are correct. Bag-level metrics are therefore treated as guardrails, while the selected spans require separate evaluation.
-
-The repository contains both multi-scale candidate-span experiments and refined experiments in which each configuration uses a single candidate span length.
-
-### LLM-generated spans as a silver reference
-
-LLM-generated spans are **not gold-standard explanations**, are not treated as human annotations, and are not counted as one of the primary localization methods.
-
-The silver-reference annotations are generated with Google Gemini using:
-
-```python
-LLM_NAME = "gemini-3-flash-preview"
-```
-
-Gemini is prompted to identify minimal verbatim spans that explain why an argument is inappropriate. The returned span text and character offsets are validated against the original argument. Invalid offsets are either repaired through exact text matching or marked as invalid. The resulting annotations provide a **silver reference** for comparing the spans produced by the six primary localization approaches.
-
-The LLM reference is used to calculate overlap-oriented metrics such as:
-
-- precision;
-- recall;
-- F1;
-- intersection over union;
-- overlap hit rate;
-- selected-rank statistics.
-
-The LLM spans have several important limitations:
-
-- they may reflect the LLM's semantic judgment rather than the classifier's decision process;
-- they may omit valid evidence or include plausible but unnecessary context;
-- they can be affected by prompting, model version, and decoding behavior;
-- agreement with them does not prove classifier faithfulness;
-- disagreement with them does not necessarily imply that a method is wrong.
-
-For these reasons, the LLM annotations are consistently described as a **silver reference**, never as span-level ground truth. The planned human study provides an independent evaluation of the semantic quality of the extracted spans.
-
----
-
-## Experimental workflow
-
-### 1. Prepare one canonical dataset
-
-The dataset is downloaded once and converted into a shared processed representation. The preparation step:
-
-- downloads or loads the official Hugging Face dataset;
-- stores a local raw copy;
-- preserves the official train, validation, and test splits;
-- applies minimal Unicode and whitespace normalization;
-- assigns a stable `global_row_id`;
-- obtains the original binary classifier predictions;
-- stores `p_inappropriate_original`;
-- derives predicted labels and confidence scores;
-- assigns confusion types;
-- saves the processed data as Parquet;
-- records preprocessing metadata for reproducibility.
-
-All experiment notebooks load this same prepared dataset. This prevents accidental differences in normalization, IDs, classifier predictions, or split handling across methods.
-
-### 2. Record classifier confusion types
-
-Each argument is categorized relative to the corpus label and the original classifier prediction:
-
-| Type | Gold label | Classifier prediction |
-|---|---:|---:|
-| TP | Inappropriate | Inappropriate |
-| FN | Inappropriate | Appropriate |
-| FP | Appropriate | Inappropriate |
-| TN | Appropriate | Appropriate |
-
-Configuration selection focuses primarily on **true positives**. For a true positive, both the human document-level label and the classifier agree that the argument is inappropriate, making the localization of positive inappropriate evidence most directly interpretable.
-
-The other confusion types are retained for complementary analyses of model behavior and robustness.
-
-### 3. Select method configurations on development data
-
-Method-specific hyperparameters are selected using development data rather than the held-out test set. Depending on the experiment notebook, the development pool consists of validation true positives or the combined train-and-validation true positives.
-
-The final standardized evaluation follows the same principle:
-
-- configuration search only on development data;
-- no configuration selection on test examples;
-- one fixed configuration per method for final test evaluation.
-
-The configuration choice balances several criteria rather than maximizing probability drop alone:
-
-- mean probability drop;
-- median probability drop;
-- positive drop rate;
-- masked token or word ratio;
-- explanation length;
-- stability across examples;
-- qualitative readability.
-
-### 4. Apply the selected configuration to test data
-
-After configuration selection, the chosen setup is fixed and applied to the held-out test split.
-
-Each method exports:
-
-- argument-level results;
-- span-level results;
-- configuration summaries;
-- split-level summaries;
-- confusion-type summaries;
-- serialized span metadata;
-- selected plots and qualitative examples.
-
-### 5. Compare methods under a shared protocol
-
-Although the methods generate spans differently, they are evaluated through a common interface:
-
-1. extract one or more spans;
-2. retain their original character offsets;
-3. mask or delete the selected text;
-4. rerun the same document-level classifier;
-5. measure the probability change;
-6. normalize by the amount of perturbed text;
-7. optionally compare the spans with the LLM silver reference;
-8. evaluate semantic quality in the human study.
-
----
-
-## Evaluation
-
-No single metric can establish that a span is simultaneously faithful, semantically correct, concise, and complete. The project therefore combines complementary evaluation perspectives.
-
-### Perturbation-based faithfulness
-
-For an argument $x$ and selected spans $S$, let $x^{\mathrm{abl}(S)}$ denote the argument after masking or deleting those spans.
-
-The probability drop is:
+For selected spans $S$, masking produces $x^{\mathrm{mask}(S)}$. The probability drop is
 
 $$
-\Delta p(x,S) = p_{\mathrm{inappropriate}}(x) - p_{\mathrm{inappropriate}}\left(x^{\mathrm{abl}(S)}\right)
+\Delta p(x,S)=p_1(x)-p_1\!\left(x^{\mathrm{mask}(S)}\right).
 $$
 
-Interpretation:
+A positive drop means the inappropriate-class probability decreases. A negative drop means it increases. **PDR** is the fraction of arguments with a strictly positive drop. The **masked-token ratio** is the proportion of valid classifier-text tokens covered by the span union, with overlapping coverage counted once.
 
-- $\Delta p > 0$: perturbing the selected spans lowers the inappropriate probability;
-- $\Delta p = 0$: the perturbation has no measured effect;
-- $\Delta p < 0$: perturbing the selected spans increases the inappropriate probability.
+The comparison reports mean, median, and standard deviation of probability drop, PDR, masked-token coverage, and class-flip rates. Logit drops provide a supplementary diagnostic for highly confident predictions. Higher drops must be interpreted alongside coverage: selecting more text can increase perturbation strength without improving localization precision.
 
-A larger positive drop suggests that the selected spans contain evidence used by the classifier. However, probability drop must be interpreted together with explanation size. Masking half of an argument will often have a stronger effect than masking one precise phrase.
+Paired comparisons use Wilcoxon signed-rank tests, exact McNemar tests for binary positive-drop outcomes, bootstrap confidence intervals, and Holm correction within the relevant comparison families.
 
-The positive drop rate is:
+### Ranking faithfulness
 
-$$
-\mathrm{PDR} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{1}\left[\Delta p_i > 0\right]
-$$
+AOPC evaluates relevance rankings independently of final span construction at perturbation fractions **1%, 5%, 10%, 20%, and 50%**, without method-specific context expansion. Each argument has **ten matched random rankings**, averaged before dataset aggregation. AOPC is analyzed for score-based methods against their matched references.
 
-The masked-token ratio is:
+Ranking units differ: TF-IDF uses word occurrences, Attention and IG use model tokens, and SHAP uses explainer segments. AOPC therefore supports within-method comparisons with matched random rankings more directly than strict cross-method ranking comparisons.
 
-$$
-r_i = \frac{\text{number of masked model tokens in }x_i} {\text{number of model tokens in }x_i}
-$$
+### LLM-reference overlap
 
-Reported perturbation metrics include:
+The fixed 100-argument subset is annotated with Gemini. Predictions and references are mapped to the same classifier-token positions. The comparison reports argument-macro Precision, Recall, F1, IoU, median F1/IoU, overlap-hit rate, and supplementary micro aggregates. A hit means at least one selected token overlaps the reference.
 
-- mean and median probability drop;
-- standard deviation of probability drop;
-- positive drop rate;
-- stronger-drop rates for selected thresholds;
-- mean masked token or word ratio;
-- mean number and length of selected spans;
-- probability drop relative to the perturbation budget.
+These are agreement measures against a **silver reference**, not accuracy against gold explanations. The comparison also evaluates the perturbation behavior and coverage of the LLM spans on the same 100 arguments.
 
-Masking preserves the input length but introduces the model's mask token. Deletion removes the text and changes the surrounding sequence. Both interventions may create out-of-distribution inputs, so results are interpreted as evaluation proxies rather than direct causal proof.
+### Results at a glance
 
-### Overlap with the LLM silver reference
+The following values are the final masking results on the **186 test true positives** (thesis Table 6.10), not the development results or the 100-argument LLM subset.
 
-Let $M$ be the set of positions selected by a localization method and $R$ the set selected by the LLM silver reference.
+| Method | Mean probability drop | PDR | Mean masked-token ratio |
+|---|---:|---:|---:|
+| Random | 0.128 | 83.3% | 50.1% |
+| TF-IDF | 0.057 | 81.2% | 63.6% |
+| Attention | 0.237 | 96.2% | 60.0% |
+| Integrated Gradients | 0.123 | 89.8% | 62.7% |
+| SHAP | 0.203 | 95.2% | 41.4% |
+| MIL | 0.153 | 78.0% | 55.7% |
 
-Precision is:
+Attention produces the strongest mean response and highest PDR on this subset. SHAP combines a strong response with substantially lower coverage and provides the most balanced overall trade-off across the thesis's evaluation perspectives. MIL obtains the highest macro overlap with the LLM reference on the 100-argument subset (F1 `0.3831`, IoU `0.2795`). In the human study, LLM spans receive the strongest combined Completeness/Precision assessment; SHAP provides the strongest combined assessment among the six primary approaches. TF-IDF receives the highest mean Completeness rating but low Precision.
 
-$$
-\mathrm{Precision} = \frac{|M\cap R|}{|M|}
-$$
-
-Recall is:
-
-$$
-\mathrm{Recall} = \frac{|M\cap R|}{|R|}
-$$
-
-F1 is:
-
-$$
-\mathrm{F1} = \frac{2\cdot\mathrm{Precision}\cdot\mathrm{Recall}}
-{\mathrm{Precision}+\mathrm{Recall}}
-$$
-
-Intersection over union is:
-
-$$
-\mathrm{IoU} = \frac{|M\cap R|}{|M\cup R|}
-$$
-
-The overlap evaluation also considers whether at least one selected candidate overlaps the reference and, for ranked candidate spans, which rank first achieves an overlap.
-
-These metrics measure agreement with the silver reference, not absolute correctness. They are therefore reported separately from perturbation faithfulness.
-
-### Human evaluation
-
-The human evaluation is implemented as a **blinded LimeSurvey study**. Its purpose is to assess semantic explanation quality that cannot be established by perturbation scores or overlap with the LLM silver reference alone.
-
-> **Survey link:** _[LimeSurvey link will be added here]_
-
-The survey follows the concept and taxonomy of inappropriateness introduced by Ziegenbein et al. (2023). Before the actual ratings, participants receive:
-
-- study information, consent, and a content warning;
-- a short explanation of inappropriateness in argumentation;
-- a simplified overview of the four core inappropriateness categories;
-- an explicit note that inappropriateness is subjective;
-- a reminder to judge each argument in the context of its discussion issue rather than by agreement with its position;
-- a comprehension question;
-- a short practice example.
-
-Each completed participation contains **seven argument pages**. For every argument, the participant first sees the discussion issue and the argument **without highlights** and rates its overall inappropriateness on a 1–7 scale. Afterwards, three highlighted explanations are shown as **Explanation A**, **Explanation B**, and **Explanation C**. The underlying source names are hidden from participants.
-
-Each highlighted explanation is rated on a 1–7 scale according to four criteria:
-
-- **Relevance:** The highlighted spans identify text that contributes to the argument being inappropriate.
-- **Sufficiency:** Taken together, the highlighted spans provide enough evidence to justify classifying the argument as inappropriate.
-- **Completeness:** All or nearly all important reasons for the argument's inappropriateness have been highlighted.
-- **Precision:** The highlights contain little or no unnecessary or unrelated text.
-
-Participants may select a dedicated *Not assessable* option if they do not consider the argument inappropriate. After rating the three explanations, they also indicate which explanation best localizes the reasons for inappropriateness, with an additional no-preference option and an optional comment field.
-
-The study draws from seven explanation sources:
-
-- SHAP;
-- Integrated Gradients;
-- Attention;
-- TF-IDF;
-- Multiple Instance Learning;
-- Random baseline;
-- the LLM-generated silver reference.
-
-The LLM spans remain a **silver reference**, not a seventh primary localization method or human gold standard. They are included as a blinded reference condition so that their perceived explanation quality can be compared with the other approaches.
-
-The questionnaire uses seven internally balanced variants. Within every completed participation:
-
-- 7 arguments are evaluated;
-- 3 explanations are shown per argument;
-- 21 explanation ratings are completed;
-- every explanation source appears exactly 3 times;
-- every pair of explanation sources appears together exactly once;
-- every explanation source appears exactly once as A, once as B, and once as C.
-
-A hidden LimeSurvey variable assigns one of the seven questionnaire variants. This keeps the method presentation balanced while allowing all participants to use the same public survey link.
-
-The generated survey is configured for anonymous responses. It does not store names, email addresses, IP addresses, referrer URLs, or timestamps. Page-level response timings are enabled, and a cookie is used to reduce accidental repeated participation.
-
-The human study complements the automatic evaluation rather than replacing it. In particular, it allows semantically meaningful and concise explanations to be distinguished from perturbations that affect the classifier for technical or distributional reasons.
-
----
+These conclusions are specific to the evaluated classifier, corpus, configurations, and samples. No single measure establishes both classifier faithfulness and human plausibility.
 
 ## Repository structure
-
-The repository separates reusable source code, generated data, method notebooks, baselines, evaluation notebooks, and result artifacts.
 
 ```text
 Localizing-Inappropriateness-in-Arguments/
@@ -602,16 +222,20 @@ Localizing-Inappropriateness-in-Arguments/
 │   ├── survey_input/
 │   │   ├── study_items.csv
 │   │   └── selected_argument_ids.txt
-│   └── survey_output/
-│       ├── span_human_study_import.txt
-│       ├── selected_arguments.csv
-│       ├── variant_design.csv
-│       ├── question_mapping.csv
-│       ├── preview_version_1.html
-│       └── generation_report.txt
+│   ├── survey_output/
+│   │   ├── span_human_study_import.txt
+│   │   ├── selected_arguments.csv
+│   │   ├── variant_design.csv
+│   │   ├── question_mapping.csv
+│   │   ├── preview_version_1.html
+│   │   └── generation_report.txt
+│   └── survey_results/
 ├── results/
 │   ├── ablation_comparison/
 │   ├── evaluation/
+│   │   ├── comparison/
+│   │   ├── methods_vs_llm/
+│   │   └── mil/
 │   ├── attention_results/
 │   ├── ig_results/
 │   ├── mil_results/
@@ -632,380 +256,98 @@ Localizing-Inappropriateness-in-Arguments/
 └── README.md
 ```
 
-The `data/` directory is generated locally by `python -m src.prepare_data`. Large raw and processed dataset files generally do not need to be committed to Git, provided that they can be regenerated through the documented preparation command.
+## What runs where and where results are written
 
-### Directory and file guide
+All paths below are relative to the repository root. The table documents the result-directory layout; concrete filenames and run subdirectories are controlled by the export cells in the corresponding notebook. Preserve selected configurations and run metadata alongside their outputs.
 
-#### Data
+| Notebook or script | Inputs and work performed | Output directory and contents |
+|---|---|---|
+| `src/prepare_data.py` | Loads corpus splits, normalizes text, creates stable IDs, and computes fixed-classifier predictions. | `data/raw/appropriateness_corpus/`: raw splits; `data/processed/`: canonical Parquet and preparation metadata. |
+| `evaluation/mask_vs_delete.ipynb` | Compares paired masking/deletion on validation TPs using preliminary span sources. Establishes the common operator before final configuration search. | `results/ablation_comparison/`: operator summaries, argument-level comparisons, confidence intervals, tests, and figures. |
+| `baselines/random_baseline.ipynb` | Searches random-selection configurations on development TPs; generates one final sample per test argument. | `results/random_baseline_results/`: repeated development samples, configuration summaries, fixed final spans, argument/span exports, and plots. |
+| `baselines/tf-idf_baseline.ipynb` | Fits development-text TF-IDF, searches anchor/context settings, and evaluates final test spans and rankings. | `results/tfidf_baseline_results/`: lexical scores/anchors, configuration summaries, final spans, perturbation results, AOPC outputs, and plots. |
+| `methods/attention_spans.ipynb` | Computes attention scores, compares `last_cls`/`rollout`, selects token spans, and evaluates final outputs. | `results/attention_results/`: scores, configuration summaries, argument/span exports, AOPC outputs, and plots. |
+| `methods/integrated_gradients_spans.ipynb` | Computes embedding-layer IG, searches token quantile/gap settings, and evaluates final outputs. | `results/ig_results/`: signed attributions, configuration summaries, argument/span exports, AOPC outputs, and plots. |
+| `methods/shap_spans.ipynb` | Caches SHAP explanations, searches positive-segment selection settings, and evaluates final outputs. | `results/shap_results/`: cached explanations, configuration summaries, argument/span exports, AOPC outputs, and plots. |
+| `methods/mil_spans.ipynb` | Trains coarse MIL configurations over grouped candidate lengths and evaluates bag/span behavior. | `results/mil_results/`: coarse-search checkpoints, configuration summaries, candidate scores, and localization outputs. |
+| `methods/mil_spans_singles.ipynb` | Trains refined single-length MIL configurations and selects the final checkpoint and spans. | `results/mil_results/`: refined-search checkpoints and final bag/candidate/span outputs; `results/evaluation/mil/`: consolidated MIL bag-classification diagnostics and figures. |
+| `methods/llm_spans.ipynb` | Annotates the fixed 100 test TPs, validates verbatim offsets, and evaluates reference spans with the fixed classifier. | `results/llm_reference/`: annotation checkpoints, raw/validated responses, repair metadata, reference spans, and perturbation outputs. |
+| `evaluation/methods_vs_baselines.ipynb` | Aligns fixed method outputs by ID and compares perturbation strength, consistency, compactness, and supplementary diagnostics. | `results/evaluation/comparison/`: merged comparisons, statistical tables, plots, and qualitative examples. |
+| `evaluation/methods_vs_llm.ipynb` | Aligns method outputs with the 100-argument silver reference; compares overlap, perturbation response, and coverage. | `results/evaluation/methods_vs_llm/`: overlap summaries, matched-subset comparisons, statistical tables, and plots. |
+| `human_study/prepare_survey_data.py` | Aligns seven explanation sources, selects seven eligible arguments with distinct issues, and prepares presentation spans. | `human_study/survey_input/`: `study_items.csv` and `selected_argument_ids.txt`. |
+| `human_study/generate_limesurvey.py` | Builds the blinded four-explanation study and seven balanced variants from the prepared study items. | `human_study/survey_output/`: import file, selected arguments, variant design, question mapping, HTML preview, and generation report. |
+| Human-study response analysis | Maps exported question codes to sources, aggregates participant-level ratings/rankings, and analyzes study results. | `human_study/survey_results/`: result plots and tables from the completed survey. The supplied layout does not list a separate analysis notebook or script. |
 
-| Path | Purpose |
+**Generation and evaluation have different roles:** method notebooks create scores and final spans; evaluation notebooks consume fixed outputs and create shared comparisons. `make study` generates the questionnaire artifacts; it does not collect responses or perform response analysis.
+
+### Shared source files
+
+| File | Responsibility |
 |---|---|
-| `data/raw/appropriateness_corpus/` | Local on-disk copy of the official Hugging Face Appropriateness Corpus. |
-| `data/raw/appropriateness_corpus/train/` | Original training split stored by Hugging Face Datasets. |
-| `data/raw/appropriateness_corpus/validation/` | Original validation split stored by Hugging Face Datasets. |
-| `data/raw/appropriateness_corpus/test/` | Original held-out test split stored by Hugging Face Datasets. |
-| `data/processed/appropriateness_prepared.parquet` | Canonical table used by all notebooks. It combines the splits and adds normalized text, stable IDs, classifier outputs, and confusion-type information. |
-| `data/processed/appropriateness_prepared_metadata.json` | Reproducibility metadata describing the dataset, classifier, preprocessing settings, split sizes, and preparation time. |
+| `src/data.py` | Loads the canonical prepared dataset and exposes the full table and individual splits. |
+| `src/prepare_data.py` | Owns raw-data preparation, normalization, IDs, original predictions, and preparation exports. |
+| `src/utils.py` | Shared normalization, classifier, confusion-type, span-perturbation, highlighting, and serialization helpers. |
+| `src/survey/limesurvey_tsv.py` | Reusable LimeSurvey TSV construction. |
+| `src/survey/survey_design.py` | Balanced explanation assignments and questionnaire variants. |
+| `src/__init__.py` | Package marker; imports can come directly from `src.data` and `src.utils`. |
+| `Makefile` | Environment setup, data preparation, Jupyter startup, cleanup, and survey-generation shortcuts. |
+| `requirements.txt` | Python dependencies for the experimental workflow. |
 
-#### Baselines
+Method-specific attribution, training, configuration search, and export logic remains in the corresponding notebooks.
 
-| File | Purpose |
-|---|---|
-| `baselines/random_baseline.ipynb` | Generates randomly selected spans under controlled span-length and selection configurations. It provides a chance-level reference for perturbation-based evaluation. |
-| `baselines/tf-idf_baseline.ipynb` | Selects lexically salient words or spans using TF-IDF. It provides a transparent non-neural baseline that does not use classifier internals. |
+## Installation and Makefile workflow
 
-#### Localization methods and silver reference
-
-| File | Purpose |
-|---|---|
-| `methods/attention_spans.ipynb` | Extracts and aggregates attention-based token scores, converts selected tokens into readable spans, and evaluates them through classifier perturbation. |
-| `methods/integrated_gradients_spans.ipynb` | Computes Integrated Gradients for the inappropriate class, aggregates subword attributions, builds spans, and evaluates the selected evidence. |
-| `methods/mil_spans.ipynb` | Trains and evaluates the main Multiple Instance Learning setup using bags of candidate spans, including experiments with multiple candidate-span granularities. |
-| `methods/mil_spans_singles.ipynb` | Runs refined MIL experiments in which each configuration uses a single candidate span length, enabling a more controlled comparison of span granularity. |
-| `methods/shap_spans.ipynb` | Computes SHAP attributions for the inappropriate class, selects high-attribution segments, merges them into spans, and evaluates their perturbation effect. |
-| `methods/llm_spans.ipynb` | Generates and validates Gemini span annotations. These spans are stored as a **silver reference** for evaluating the other methods and are not treated as human gold labels or as a primary localization method. |
-
-#### Cross-method evaluation
-
-| File | Purpose |
-|---|---|
-| `evaluation/mask_vs_delete.ipynb` | Compares masking and deletion as perturbation operators across the final method outputs and LLM reference spans. |
-| `evaluation/methods_vs_baselines.ipynb` | Places the primary localization methods next to the random and TF-IDF baselines under a shared set of faithfulness, efficiency, and span-size metrics. |
-| `evaluation/methods_vs_llm.ipynb` | Compares method spans with the Gemini silver reference using overlap-oriented metrics such as precision, recall, F1, IoU, hit rate, and rank-based measures. |
-
-#### Human study
-
-| File or path | Purpose |
-|---|---|
-| `human_study/prepare_survey_data.py` | Reads the fixed final outputs of Random, TF-IDF, Attention, Integrated Gradients, SHAP, MIL, and the LLM silver reference. It keeps common test true positives, converts each method's offsets into one shared span representation, selects seven arguments reproducibly, and writes the survey input files. |
-| `human_study/generate_limesurvey.py` | Builds the complete blinded LimeSurvey questionnaire from the prepared study items and selected argument IDs. It creates the balanced questionnaire variants, rating questions, preference questions, consent and introduction pages, and LimeSurvey import artifacts. |
-| `human_study/survey_input/study_items.csv` | Unified long-format study input containing the seven selected arguments for all seven explanation sources, including their highlighted character spans. |
-| `human_study/survey_input/selected_argument_ids.txt` | Stores the seven reproducibly selected `global_row_id` values used by the generated questionnaire. |
-| `human_study/survey_output/span_human_study_import.txt` | Complete LimeSurvey TSV survey structure that can be imported into LimeSurvey. |
-| `human_study/survey_output/selected_arguments.csv` | Human-readable list of the seven arguments included in the survey. |
-| `human_study/survey_output/variant_design.csv` | Records which argument and which blinded explanations A/B/C appear at each position in each of the seven questionnaire variants. |
-| `human_study/survey_output/question_mapping.csv` | Maps blinded LimeSurvey question codes and display labels back to the underlying explanation sources for later analysis. |
-| `human_study/survey_output/preview_version_1.html` | Static browser preview of the introduction and highlighted stimuli for questionnaire variant 1. |
-| `human_study/survey_output/generation_report.txt` | Summarizes the generated survey, balance guarantees, scale, and checks that should be completed before activation. |
-
-The generated survey is a study artifact, not an additional localization method. In particular, the LLM condition remains the project's silver reference.
-
-#### Results
-
-| Path | Purpose |
-|---|---|
-| `results/attention_results/` | Argument-level and span-level attention results, configuration summaries, and plots. |
-| `results/ig_results/` | Integrated-Gradients results, summaries, and plots. |
-| `results/mil_results/` | MIL checkpoints or model outputs, selected configurations, span results, summaries, and plots. |
-| `results/random_baseline_results/` | Random-baseline samples, final random spans, summaries, and plots. |
-| `results/shap_results/` | SHAP attributions, selected spans, configuration summaries, and plots. |
-| `results/tfidf_baseline_results/` | TF-IDF span results, summaries, and plots. |
-| `results/llm_reference/` | Validated Gemini silver-reference annotations and their perturbation-evaluation outputs. |
-| `results/ablation_comparison/` | Consolidated outputs and figures from the mask-versus-delete analysis. |
-| `results/evaluation/` | Tables, figures, and merged outputs generated by the notebooks under `evaluation/`. |
-
-Each method-specific result directory may contain several artifact types:
-
-- per-argument predictions and perturbation results;
-- per-span character offsets and span texts;
-- development-set configuration summaries;
-- fixed final test configurations;
-- aggregate CSV files;
-- qualitative examples;
-- plots used for analysis and reporting.
-
-#### Shared source code
-
-| File | Purpose |
-|---|---|
-| `src/__init__.py` | Marks `src` as a Python package. It can remain minimal; notebook code may import directly from `src.data` and `src.utils`. |
-| `src/data.py` | Loads and validates the canonical processed dataset and returns the full data frame or the individual train, validation, and test splits. |
-| `src/prepare_data.py` | Downloads or loads the corpus, stores the raw splits, creates stable IDs, normalizes texts, computes the original classifier outputs, and writes the processed dataset and metadata. |
-| `src/utils.py` | Contains reusable project-wide helpers for text normalization, split assignment, classifier inference, confusion types, span perturbation, highlighting, and serialization. |
-| `src/survey/limesurvey_tsv.py` | Provides the reusable LimeSurvey TSV builder used by the human-study generator. |
-| `src/survey/survey_design.py` | Constructs the balanced questionnaire variants used to distribute explanation sources across arguments and labels A/B/C. |
-| `Makefile` | Provides reproducible convenience commands for environment setup, data preparation, Jupyter startup, cleanup, and human-study generation. |
-| `requirements.txt` | Defines the Python packages needed for data preparation, notebooks, attribution methods, evaluation, the Gemini API integration, and survey generation. |
-| `README.md` | Documents the research context, setup, methods, data flow, evaluation protocol, human-study workflow, and repository usage. |
-
-Method-specific attribution, span-selection, training, and result-building logic remains in the corresponding notebook. Shared logic that must behave identically across methods belongs in `src/`.
-
-## Installation
-
-### Requirements
-
-The repository is designed for **Python 3.11**.
-
-A CUDA-capable GPU is strongly recommended for:
-
-- SHAP;
-- Integrated Gradients;
-- attention extraction;
-- MIL training.
-
-The smaller preprocessing and evaluation steps can also run on CPU.
-
-### 1. Clone the repository
+Use **Python 3.11**. CUDA acceleration is recommended for attribution and MIL; the implementation also supports MPS and CPU. The thesis experiments used Python `3.11.10`, PyTorch `2.5.0` with CUDA `12.1`, primarily an NVIDIA A100 MIG `3g.20gb` allocation with 20 GB GPU memory on a Slurm-managed cluster.
 
 ```bash
 git clone https://github.com/Karbs08/Localizing-Inappropriateness-in-Arguments.git
 cd Localizing-Inappropriateness-in-Arguments
-```
-
-### Recommended: initialize with Make
-
-On Linux or macOS, the complete local setup can be initialized from the repository root with:
-
-```bash
 make init
-```
-
-This creates `.venv`, upgrades pip, installs the dependencies from `requirements.txt`, and prepares the canonical Appropriateness Corpus used by the experiments.
-
-After initialization, JupyterLab can be started with:
-
-```bash
 make jupyter
 ```
 
-The manual setup steps below remain useful when `make` is unavailable or when individual setup steps need to be run separately.
+`make init` creates the environment, installs requirements, and prepares the shared dataset. Survey generation is a separate step because it requires final explanation outputs.
 
-### 2. Create a virtual environment
+| Command | Purpose |
+|---|---|
+| `make init` | Create `.venv`, install requirements, and prepare the shared dataset. |
+| `make venv` | Create the virtual environment. |
+| `make install` | Install or update requirements. |
+| `make prepare-data` | Prepare data if the processed files are missing. |
+| `make force-prepare-data` | Rerun preparation after relevant data, model, or preprocessing changes. |
+| `make kernel` | Register the project Jupyter kernel. |
+| `make jupyter` | Start JupyterLab using the project environment. |
+| `make study` | Run study-data preparation, then questionnaire generation. |
+| `make clean-data` | Remove generated raw and processed data. |
+| `make clean-venv` | Remove the virtual environment. |
 
-#### Linux or macOS
+### Manual setup
 
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
-```
-
-#### Windows PowerShell
-
-```powershell
-py -3.11 -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-After activation, the terminal should show the environment name, usually `(.venv)`.
-
-### 3. Upgrade pip
-
-```bash
 python -m pip install --upgrade pip
-```
-
-### 4. Install the dependencies
-
-```bash
 python -m pip install -r requirements.txt
+python -m ipykernel install --user --name localizing-inappropriateness --display-name "Python (Localizing Inappropriateness)"
+python -m src.prepare_data
+jupyter lab
 ```
 
-The requirements include the main experiment stack:
-
-- PyTorch;
-- Transformers;
-- Hugging Face Datasets;
-- pandas and NumPy;
-- scikit-learn;
-- SHAP;
-- Captum;
-- Matplotlib;
-- JupyterLab.
-
-For GPU execution, make sure that the installed PyTorch build is compatible with the available CUDA version. On managed GPU systems or containers, a suitable PyTorch installation may already be provided.
-
-### 5. Register the environment as a Jupyter kernel
-
-```bash
-python -m ipykernel install \
-  --user \
-  --name localizing-inappropriateness \
-  --display-name "Python (Localizing Inappropriateness)"
-```
-
-Select **Python (Localizing Inappropriateness)** as the kernel when opening the notebooks.
-
-### 6. Deactivate the environment
-
-When finished:
-
-```bash
-deactivate
-```
-
----
-
-
-
-## Makefile workflow
-
-The project-level `Makefile` provides convenience targets for the recurring setup and generation steps.
-
-| Command | Purpose |
-|---|---|
-| `make init` | Create `.venv`, install all requirements, and prepare the canonical dataset. |
-| `make venv` | Create the local virtual environment without running the remaining setup steps. |
-| `make install` | Install or update packages from `requirements.txt`. |
-| `make prepare-data` | Prepare the shared dataset if the processed files are missing. |
-| `make force-prepare-data` | Explicitly rerun `python -m src.prepare_data`, for example after changing preprocessing or classifier settings. |
-| `make kernel` | Register the project environment as a named Jupyter kernel. |
-| `make jupyter` | Start JupyterLab from the repository root using the project environment. |
-| `make study` | Prepare the human-study input data and generate the LimeSurvey survey artifacts. |
-| `make clean-data` | Remove the locally generated raw and processed dataset files. |
-| `make clean-venv` | Remove the local `.venv` environment. |
-
-The human-study target executes the two study-generation stages in order:
-
-```makefile
-study:
-	python human_study/prepare_survey_data.py
-	python human_study/generate_limesurvey.py
-```
-
-Because the current `study` target invokes `python` directly, the project virtual environment should be activated before running it:
-
-```bash
-source .venv/bin/activate
-make study
-```
-
-The human study is intentionally **not** part of `make init`. It depends on fixed final result files from all explanation sources and should only be generated after the relevant method, baseline, and LLM-reference outputs are available.
-
-## Google Gemini API setup
-
-The notebook `methods/llm_spans.ipynb` uses the Google Gemini API to create the LLM-based silver-reference annotations.
-
-The configured model is:
-
-```python
-LLM_NAME = "gemini-3-flash-preview"
-```
-
-A valid Google Gemini API key is required only for generating or regenerating the silver reference. The other localization methods, baselines, data preparation, and evaluations do not require this API key.
-
-### 1. Create a project-level `.env` file
-
-Create a file named `.env` in the repository root, next to `README.md` and `requirements.txt`:
-
-```text
-Localizing-Inappropriateness-in-Arguments/
-├── .env
-├── README.md
-├── requirements.txt
-├── methods/
-├── evaluation/
-└── src/
-```
-
-Add the API key to the file:
-
-```dotenv
-GEMINI_API_KEY=your_google_gemini_api_key
-```
-
-The notebook can load it with:
-
-```python
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
-API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not API_KEY:
-    raise RuntimeError(
-        "GEMINI_API_KEY is missing. Add it to the project-level .env file."
-    )
-```
-
-The environment-variable name in `.env` and the name passed to `os.getenv(...)` must match.
-
-### 2. Do not commit the key
-
-The `.env` file contains a secret and must never be pushed to GitHub. Ensure that the project-level `.gitignore` contains:
-
-```gitignore
-.env
-```
-
-An optional `.env.example` file may be committed to document the required variable without exposing a key:
-
-```dotenv
-GEMINI_API_KEY=
-```
-
-### 3. Required Python packages
-
-The Gemini notebook requires the Google Gen AI client library and `python-dotenv` in addition to the general experiment dependencies. These packages should be included in `requirements.txt`, so the normal installation command remains sufficient:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 4. Silver-reference reproducibility
-
-The generated annotations depend on the configured model, prompt, schema, API behavior, and provider-side model version. The exported reference files should therefore retain at least:
-
-- the model name;
-- the prompt or prompt version;
-- the returned span texts;
-- original and validated offsets;
-- validation or repair flags;
-- confidence values, when requested;
-- errors and retry information where relevant.
-
-API keys must never be written to result files, notebooks, logs, or metadata exports.
+On Windows PowerShell, create the environment with `py -3.11 -m venv .venv` and activate it with `.venv\Scripts\Activate.ps1`. Select the project kernel in Jupyter. GPU execution requires a PyTorch build compatible with the available CUDA environment.
 
 ## Data preparation
 
-Before running the experiment notebooks, prepare the shared dataset once from the repository root. This is already included in `make init`. It can also be run independently with:
+Run preparation from the repository root:
 
 ```bash
 make prepare-data
-```
-
-or directly with:
-
-```bash
+# Alternatively, with the project environment activated:
 python -m src.prepare_data
 ```
 
-This command downloads the official dataset and model when they are not already available in the local Hugging Face cache. It then creates the canonical local files under:
+The canonical output is `data/processed/appropriateness_prepared.parquet`, accompanied by `appropriateness_prepared_metadata.json`. In addition to corpus fields, shared columns include `split`, `global_row_id`, `text_norm`, `p_inappropriate_original`, `predicted_label`, `predicted_score`, `confusion_type`, and the confusion-type indicator fields.
 
-```text
-data/raw/appropriateness_corpus/train/
-data/raw/appropriateness_corpus/validation/
-data/raw/appropriateness_corpus/test/
-data/processed/appropriateness_prepared.parquet
-data/processed/appropriateness_prepared_metadata.json
-```
-
-The processed file contains the original corpus fields together with shared experiment columns such as:
-
-- `split`;
-- `global_row_id`;
-- `text_norm`;
-- `p_inappropriate_original`;
-- `predicted_label`;
-- `predicted_score`;
-- `confusion_type`;
-- `is_true_positive`;
-- `is_false_negative`;
-- `is_false_positive`;
-- `is_true_negative`.
-
-The preparation command should be rerun whenever one of the following changes:
-
-- the dataset version;
-- the binary classifier;
-- the text-normalization logic;
-- the maximum input length;
-- the classifier label mapping;
-- the shared prediction logic.
-
-Experiment notebooks load the prepared data through:
+Notebooks load the same prepared splits through:
 
 ```python
 from src.data import load_prepared_splits
@@ -1013,282 +355,142 @@ from src.data import load_prepared_splits
 df_all, train_df, val_df, test_df = load_prepared_splits()
 ```
 
-The data-loading functions do not need to be re-exported through `src/__init__.py`; importing them directly from `src.data` keeps their origin explicit.
+Rerun preparation when the dataset, classifier/tokenizer revision, normalization, maximum input length, label mapping, or prediction logic changes. Dependent cached attributions and result files must also be regenerated or kept under distinct run identities.
 
----
+## Running the experiments
 
-## Running the notebooks
+1. Initialize the environment and prepare the shared dataset.
+2. Run `evaluation/mask_vs_delete.ipynb` to reproduce the preliminary operator comparison.
+3. Run the required baseline and localization notebooks. For MIL, run the coarse search before the refined single-length search.
+4. Select configurations using development data, retain their settings, and produce fixed final test outputs in the method-specific result directories.
+5. Run `evaluation/methods_vs_baselines.ipynb` after the required final outputs exist.
+6. Generate or load the validated 100-argument LLM reference, then run `evaluation/methods_vs_llm.ipynb`.
+7. Generate the questionnaire from fixed explanations and inspect the study artifacts. Analyze collected response exports separately.
 
-Start Jupyter from the **repository root**, preferably through the Makefile:
+Run commands from the repository root and select the project environment. Notebook kernels may use their notebook directory as the working directory even when Jupyter is launched from the root; ensure each notebook's root-path setup resolves `src/`, `data/`, and `results/` relative to the repository root.
 
-```bash
-make jupyter
+Attribution can be costly: SHAP requires many classifier calls, IG repeatedly evaluates gradients, Attention retains attention tensors, and MIL trains separate models for the configuration search. Use debug limits for exploration where available; final thesis results require the documented complete evaluation subsets.
+
+## Gemini silver-reference setup
+
+Only generating or regenerating the silver reference requires a Gemini API key. Evaluating existing annotations does not require fresh API calls.
+
+Create a root-level `.env` file containing:
+
+```dotenv
+GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
-Alternatively, with the virtual environment activated:
+The notebook uses the Google Gen AI client and `python-dotenv`. Ensure `.env` is excluded from Git and never store the key in notebook outputs, result metadata, or logs.
 
-```bash
-jupyter lab
-```
-
-Starting Jupyter from the root ensures that imports such as the following work consistently inside notebooks stored under `baselines/`, `methods/`, and `evaluation/`:
+The thesis reference configuration is:
 
 ```python
-from src.data import load_prepared_splits
-from src.utils import normalize_text
+LLM_NAME = "gemini-3-flash-preview"
 ```
 
-Recommended order:
+The annotator receives the argument ID, discussion issue, and normalized text, with inappropriateness treated as given. It returns minimal **verbatim** spans under a structured JSON schema with start/exclusive-end offsets and self-reported confidence. Generation uses temperature `0`, batches of **five arguments**, intermediate checkpoints, and retries for temporary failures.
 
-1. run `make init` once to create the environment, install dependencies, and prepare the dataset;
-2. configure `GEMINI_API_KEY` only when the LLM silver reference must be generated;
-3. start JupyterLab from the repository root with `make jupyter`;
-4. select the project kernel if required;
-5. run the baseline and method notebooks needed for the experiment;
-6. verify their outputs in the corresponding method-specific directories under `results/`;
-7. generate or load the validated LLM silver reference;
-8. run the notebooks under `evaluation/` after all required final method files exist;
-9. store consolidated tables and figures under `results/evaluation/` and `results/ablation_comparison/`;
-10. once all fixed final explanation files are available, generate the human study with `make study`.
+Offsets are checked against the source text. Exact string matching repairs recoverable positions; unalignable spans are rejected. Store raw responses, original and validated offsets, repair flags, model/prompt settings, and unresolved cases. Confidence values are auxiliary metadata, not calibrated probabilities or evaluation weights. Preview-model availability and provider changes can affect regeneration; a substitute model constitutes a different reference run.
 
-The baseline and method notebooks are designed to be executable independently after the canonical dataset has been prepared. They still load the original classifier because each approach needs it for attribution, internal representations, span scoring, or perturbation evaluation.
+## Human study
 
-The evaluation notebooks do not generate new localization methods. They consume fixed method outputs and place them under a shared comparison protocol. Consequently, final method configurations should be selected and frozen before the final evaluation notebooks are executed.
+### Completed study design
 
-### Computational notes
+The study uses **seven arguments from seven different discussion issues**, sampled from the common test-TP pool with non-empty explanations from all seven sources. Because the LLM annotations cover 100 test TPs, this subset defines the initial candidate pool.
 
-- SHAP can require many classifier calls and may be slow on the full dataset.
-- Integrated Gradients performs repeated forward and backward passes for each argument.
-- Attention extraction requires model outputs with attention tensors.
-- MIL trains additional models over many candidate spans and is the most memory-intensive approach.
-- Result directories can become large, especially when storing checkpoints, per-span files, JSONL outputs, and intermediate configuration runs.
+The questionnaire follows a **balanced incomplete-block design**:
 
-For exploratory runs, notebook-level debug limits can be used where available. Final reported results should be generated without debug subsampling.
+- Four blinded explanations, **A–D**, are shown for each argument.
+- Each participant evaluates seven arguments and **28 explanations**.
+- Each source occurs four times per completed questionnaire.
+- Each pair of sources occurs together twice.
+- Each source appears once in each of the four display positions.
+- Seven questionnaire variants rotate assignments across arguments and vary argument order.
 
----
+The seven sources are Random, TF-IDF, Attention, IG, SHAP, MIL, and the LLM reference. Participants receive an introduction, comprehension question, and practice example. The supplied inappropriate document label is treated as given; participants evaluate localization rather than relabeling documents.
 
+Explanations receive two independent **1–7 ratings**:
 
-## Human study generation
+| Criterion | Question |
+|---|---|
+| Completeness | Do the highlights cover all important parts that could reasonably explain the argument's inappropriateness? |
+| Precision | Do the highlights focus on those parts without unnecessary or unrelated text? |
 
-The complete LimeSurvey survey can be regenerated from the fixed final explanation files with:
+Participants then rank the four explanations from best to worst. Relevance and Sufficiency are not separate collected criteria in the final study. A supplementary `F_human` combines the rescaled Completeness and Precision scores using a harmonic mean; it is an exploratory summary, not a conventional classification F1 score.
+
+**Ten participants** completed the study, yielding **280 explanation evaluations** and **40 evaluations per source**. Analysis uses participant-level method summaries, Friedman tests, Kendall's W, Holm-adjusted Wilcoxon comparisons, and ordinal Krippendorff's alpha. Inferential findings remain exploratory given the small sample and incomplete-block design.
+
+Before survey presentation, intersected words are expanded to complete word boundaries and resulting overlaps are merged consistently across sources. This affects the **human-facing highlights only**. Automatic comparisons retain the original model-derived intervals and scores.
+
+### Regenerating the questionnaire
+
+With all final method and reference outputs available:
 
 ```bash
 source .venv/bin/activate
 make study
 ```
 
-The target runs two scripts sequentially.
-
-### 1. Prepare survey data
+The two stages can also be executed separately:
 
 ```bash
 python human_study/prepare_survey_data.py
-```
-
-This script reads the final argument-level outputs for:
-
-- Random;
-- TF-IDF;
-- Attention;
-- Integrated Gradients;
-- SHAP;
-- MIL;
-- the LLM silver reference.
-
-The script restricts the inputs to the held-out **test split** and, where available, **true positives**. It converts the method-specific character-offset columns into one common span representation and keeps only arguments for which all seven explanation sources are available.
-
-Using a fixed random seed, it selects seven eligible arguments and writes:
-
-```text
-human_study/survey_input/study_items.csv
-human_study/survey_input/selected_argument_ids.txt
-```
-
-`study_items.csv` is the unified long-format survey input. Each row identifies an argument and an explanation source and contains the original issue, text, serialized highlighted spans, and selected automatic-evaluation metadata.
-
-### 2. Generate the LimeSurvey questionnaire
-
-```bash
 python human_study/generate_limesurvey.py
 ```
 
-The generator reads the prepared study items and selected argument IDs and creates the complete LimeSurvey study under:
+Preparation writes `human_study/survey_input/study_items.csv` and `selected_argument_ids.txt`. The generator writes:
 
-```text
-human_study/survey_output/
-```
-
-The most important generated files are:
-
-| File | Purpose |
+| Artifact in `human_study/survey_output/` | Purpose |
 |---|---|
 | `span_human_study_import.txt` | Importable LimeSurvey questionnaire structure. |
-| `selected_arguments.csv` | The seven arguments included in the study. |
-| `variant_design.csv` | Complete balanced assignment of arguments and explanations across the seven questionnaire variants. |
-| `question_mapping.csv` | Mapping from blinded LimeSurvey question codes back to the actual explanation sources. |
-| `preview_version_1.html` | Static preview of the introduction and highlighted stimuli for variant 1. |
-| `generation_report.txt` | Generation summary and pre-activation validation checklist. |
+| `selected_arguments.csv` | Selected study arguments. |
+| `variant_design.csv` | Argument/source/display assignments across the seven variants. |
+| `question_mapping.csv` | Mapping from blinded question codes to explanation sources. |
+| `preview_version_1.html` | Static preview of variant 1. |
+| `generation_report.txt` | Generation summary and validation information. |
 
-The generated questionnaire contains consent and a content warning, the Ziegenbein et al. definition and taxonomy of inappropriateness, a subjectivity note, a comprehension check, a practice example, seven argument pages, four explanation-quality criteria, direct explanation preferences, optional comments, and a final feedback field.
+Inspect the import and preview before reusing the questionnaire. Preserve the selected IDs, variant design, and question mapping with each response export. Survey-result plots and tables belong in **`human_study/survey_results/`**, separately from generated questionnaire artifacts.
 
-### Import into LimeSurvey
+## Reproducibility and limitations
 
-Import:
+- The global seed is **42** for Python, NumPy, and PyTorch where applicable. Random draws additionally use deterministic argument/configuration/repetition seeds.
+- Official splits, shared normalized text, stable IDs, fixed configurations, and the common classifier interface support cross-method alignment.
+- Save the exact dataset, classifier, and tokenizer revisions, package versions, preprocessing settings, and run parameters. A Hugging Face repository name alone does not identify an immutable snapshot. No exact model commit is asserted here because it is not specified in the supplied thesis/README.
+- Retain original and perturbed predictions, span offsets, configuration summaries, MIL checkpoints, cached attribution settings, and LLM validation metadata.
+- The original classifier truncates to 512 tokens. Selected evidence outside the classifier-visible input cannot explain its current prediction and must be distinguished from effective perturbation coverage.
+- Masking is a controlled intervention but still creates artificial inputs. Probability drops and AOPC are proxies for model sensitivity, not causal proof or a unique rationale.
+- Attention, IG, SHAP, TF-IDF, and MIL use different scoring units and context. Span size and merging rules influence both effects and readability.
+- The LLM receives issue context and generates semantic evidence rather than reproducing the fixed classifier's internal decision process. Overlap with it is not gold accuracy.
+- The human study covers ten participants and seven arguments. Subjectivity, incomplete-block presentation, and presentation-only word expansion limit generalization.
+- This repository localizes binary inappropriateness evidence. Associating spans with taxonomy categories and evaluating explanation sufficiency through separate retention experiments are directions for future work rather than completed outputs.
 
-```text
-human_study/survey_output/span_human_study_import.txt
-```
+## Citation and references
 
-into the target LimeSurvey instance.
-
-Before activating the study:
-
-1. open **Tools → Survey logic file** and check for errors or relevant warnings;
-2. preview the complete questionnaire;
-3. submit at least two test responses;
-4. verify that the selected version and question codes are exported correctly;
-5. verify anonymous-response, IP, referrer, cookie, and timing settings;
-6. inspect the highlighted spans and mobile presentation;
-7. only then activate the final survey.
-
-> **Public survey link:** _[LimeSurvey link will be added here]_
-
-After data collection, LimeSurvey responses should be exported with stable question codes so that `question_mapping.csv` can be used to map Explanation A/B/C back to the underlying explanation sources.
-
-## Reproducibility
-
-The project follows several measures to keep experiments comparable:
-
-- a fixed random seed is used for stochastic procedures where possible;
-- all methods use the official train, validation, and test splits;
-- the test set is reserved for final evaluation;
-- one shared prepared dataset is used across notebooks;
-- `global_row_id` provides a stable cross-method identifier;
-- character offsets refer to the normalized experiment text;
-- selected configurations are saved with their outputs;
-- argument-level and span-level results are stored separately;
-- random configuration search retains sample-level outputs;
-- the final random baseline uses one concrete sample per argument;
-- LLM offsets are validated against the source text;
-- classifier probabilities before and after perturbation are retained;
-- human-study argument selection uses a fixed random seed and the selected IDs are written to `selected_argument_ids.txt`;
-- the exact balanced questionnaire assignment is exported to `variant_design.csv`;
-- the blinded survey question codes are mapped back to explanation sources through `question_mapping.csv`.
-
-Exact reproducibility of LLM-generated annotations may additionally depend on:
-
-- the configured model, `gemini-3-flash-preview`;
-- API availability and quotas;
-- the prompt and response schema;
-- decoding settings;
-- batching and retry behavior;
-- provider-side model changes.
-
-The LLM annotation files should therefore record the model name and relevant annotation metadata. The API key itself must never be stored in committed notebooks, result files, logs, or exported metadata.
-
----
-
-## Current status
-
-### Implemented
-
-- [x] Shared text normalization and classifier helpers
-- [x] Stable IDs and confusion-type assignment
-- [x] Random span baseline
-- [x] TF-IDF baseline
-- [x] SHAP-based localization
-- [x] Integrated-Gradients-based localization
-- [x] Attention-based localization
-- [x] MIL-based localization
-- [x] Perturbation-based evaluation within method notebooks
-- [x] LLM-generated silver-reference spans
-- [x] Argument-level and span-level result exports
-- [x] Complete silver-reference overlap evaluation
-- [x] Automated human-study data preparation
-- [x] Balanced LimeSurvey questionnaire generation
-
-### In progress
-
-
-- [ ] Final LimeSurvey validation and public deployment
-- [ ] Human-study participant data collection and analysis
-- [ ] Final figures and statistical analysis
-- [ ] Final documentation of selected configurations and results
-
-No unfinished result should be interpreted as a reported final thesis result until the corresponding evaluation has been completed and consolidated.
-
----
-
-## Limitations
-
-This repository studies span localization in a setting without human gold rationales. Several limitations therefore apply.
-
-### Dependence on the original classifier
-
-The post-hoc methods explain or probe one specific binary classifier. A span that is important to this model is not necessarily the only valid human reason for judging an argument inappropriate.
-
-### Perturbation artifacts
-
-Masking and deletion modify the input distribution. A probability change may partly reflect grammatical disruption, changed sequence length, or unfamiliar mask patterns rather than removal of meaningful evidence.
-
-### Attribution is not causality
-
-SHAP, Integrated Gradients, and attention provide different notions of importance. Their scores should not automatically be interpreted as causal explanations.
-
-### Span granularity
-
-Quantile thresholds, windows, tokenization, word-boundary correction, candidate lengths, and merging rules can substantially affect explanation length and readability.
-
-### Silver-reference uncertainty
-
-The LLM-generated spans are plausible machine annotations, not gold labels. Automatic overlap with them is only one evaluation perspective.
-
-### Human subjectivity
-
-Appropriateness is context-sensitive, and people may disagree about which parts of an argument are inappropriate or how much context is needed. The human evaluation must therefore report variation and agreement rather than assuming one universally correct span.
-
----
-
-## Citation
-
-This project relies on the Appropriateness Corpus and classifier introduced by Ziegenbein et al. Please cite their ACL 2023 paper when using the dataset or model:
+When using the corpus or released classifier, cite Ziegenbein et al.:
 
 ```bibtex
 @inproceedings{ziegenbein-etal-2023-modeling,
-    title = "Modeling Appropriate Language in Argumentation",
-    author = "Ziegenbein, Timon and
-      Syed, Shahbaz and
-      Lange, Felix and
-      Potthast, Martin and
-      Wachsmuth, Henning",
-    editor = "Rogers, Anna and
-      Boyd-Graber, Jordan and
-      Okazaki, Naoaki",
-    booktitle = "Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
-    month = jul,
-    year = "2023",
-    address = "Toronto, Canada",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2023.acl-long.238/",
-    doi = "10.18653/v1/2023.acl-long.238",
-    pages = "4344--4363"
+  title = "Modeling Appropriate Language in Argumentation",
+  author = "Ziegenbein, Timon and Syed, Shahbaz and Lange, Felix and Potthast, Martin and Wachsmuth, Henning",
+  booktitle = "Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+  year = "2023",
+  publisher = "Association for Computational Linguistics",
+  url = "https://aclanthology.org/2023.acl-long.238/",
+  doi = "10.18653/v1/2023.acl-long.238",
+  pages = "4344--4363"
 }
 ```
 
----
-
-## References
-
-### Core resources
+Core resources and method references:
 
 - [Ziegenbein et al. (2023): Modeling Appropriate Language in Argumentation](https://aclanthology.org/2023.acl-long.238/)
 - [Appropriateness Corpus on Hugging Face](https://huggingface.co/datasets/timonziegenbein/appropriateness-corpus)
-- [Binary Appropriateness Classifier on Hugging Face](https://huggingface.co/timonziegenbein/appropriateness-classifier-binary)
-- [Original Appropriateness Corpus repository](https://github.com/timonziegenbein/appropriateness-corpus)
-
-### Method references
-
+- [Released binary classifier on Hugging Face](https://huggingface.co/timonziegenbein/appropriateness-classifier-binary)
+- [Original corpus repository](https://github.com/timonziegenbein/appropriateness-corpus)
 - [Lundberg and Lee (2017): A Unified Approach to Interpreting Model Predictions](https://proceedings.neurips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html)
 - [Sundararajan et al. (2017): Axiomatic Attribution for Deep Networks](https://proceedings.mlr.press/v70/sundararajan17a.html)
 - [Jain and Wallace (2019): Attention is not Explanation](https://aclanthology.org/N19-1357/)
 - [Abnar and Zuidema (2020): Quantifying Attention Flow in Transformers](https://aclanthology.org/2020.acl-main.385/)
+
+See the thesis bibliography for the complete set of references and the thesis chapters on experiments, discussion, and conclusion for detailed results and interpretation.
