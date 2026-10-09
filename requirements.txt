@@ -11,7 +11,7 @@
 # recommended for the available CUDA version before running the command above.
 
 # Core machine-learning stack
-torch==2.5.1
+torch==2.5.0
 transformers==4.46.3
 datasets==3.1.0
 pyarrow==18.1.0
@@ -33,7 +33,6 @@ shap==0.46.0
 captum==0.7.0
 
 # Evaluation
-scikit-learn==1.8.0
 krippendorff==0.7.3
 
 # Jupyter environment
