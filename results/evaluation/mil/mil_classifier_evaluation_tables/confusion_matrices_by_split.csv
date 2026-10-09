@@ -1,0 +1,9 @@
+split,method,tn,fp,fn,tp,n
+train,original_classifier,652,48,48,785,1533
+train,MIL@0.5,555,145,193,640,1533
+validation,original_classifier,66,30,36,88,220
+validation,MIL@0.5,75,21,40,84,220
+test,original_classifier,142,71,39,186,438
+test,MIL@0.5,139,74,71,154,438
+all,original_classifier,860,149,123,1059,2191
+all,MIL@0.5,769,240,304,878,2191

@@ -1,0 +1,7 @@
+method,reference,n_pairs,positive_drop_rate_method,positive_drop_rate_llm,pdr_difference,pdr_difference_pp,ci_95_lower,ci_95_upper,ci_95_lower_pp,ci_95_upper_pp,method_only_positive,llm_only_positive,n_discordant,mcnemar_p,mcnemar_p_holm,significant_holm_005
+random,llm,100,0.79,0.69,0.1,10.0,-0.01,0.21,-1.0,21.0,20,10,30,0.09873714670538905,0.2962114401161672,False
+tfidf,llm,100,0.79,0.69,0.1,10.0,-0.01,0.21,-1.0,21.0,21,11,32,0.11018416518345475,0.2962114401161672,False
+attention,llm,100,1.0,0.69,0.31,31.0,0.22,0.4,22.0,40.0,31,0,31,9.313225746154785e-10,5.587935447692871e-09,True
+ig,llm,100,0.91,0.69,0.22,22.0,0.11,0.33,11.0,33.0,28,6,34,0.00019512558355927467,0.0007805023342370987,True
+shap,llm,100,0.96,0.69,0.27,27.0,0.18,0.36,18.0,36.0,29,2,31,4.628673195838928e-07,2.314336597919464e-06,True
+mil,llm,100,0.77,0.69,0.08,8.0,-0.02,0.18,-2.0,18.0,18,10,28,0.1849333420395851,0.2962114401161672,False

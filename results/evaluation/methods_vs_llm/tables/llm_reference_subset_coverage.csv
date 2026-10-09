@@ -1,0 +1,8 @@
+method,n_llm_reference_arguments,n_available_reference_arguments,n_missing_reference_arguments,n_duplicate_rows_on_reference_subset
+random,100,100,0,0
+tfidf,100,100,0,0
+attention,100,100,0,0
+ig,100,100,0,0
+shap,100,100,0,0
+mil,100,100,0,0
+llm,100,100,0,0

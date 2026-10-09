@@ -1,0 +1,601 @@
+global_row_id,post_id,method,method_token_representation,llm_token_representation,valid_overlap_comparison,n_method_tokens,n_llm_tokens,n_intersection_tokens,n_union_tokens,overlap_hit,precision,recall,f1,iou
+1754,8,random,selected_token_indices,selected_token_indices,True,27,5,5,27,1.0,0.18518518518518517,1.0,0.3125,0.18518518518518517
+1756,12,random,selected_token_indices,selected_token_indices,True,16,16,15,17,1.0,0.9375,0.9375,0.9375,0.8823529411764706
+1759,22,random,selected_token_indices,selected_token_indices,True,31,9,3,37,1.0,0.0967741935483871,0.3333333333333333,0.15000000000000002,0.08108108108108109
+1764,54,random,selected_token_indices,selected_token_indices,True,13,13,12,14,1.0,0.9230769230769231,0.9230769230769231,0.9230769230769231,0.8571428571428571
+1768,66,random,selected_token_indices,selected_token_indices,True,35,4,4,35,1.0,0.11428571428571428,1.0,0.20512820512820512,0.11428571428571428
+1771,81,random,selected_token_indices,selected_token_indices,True,27,34,14,47,1.0,0.5185185185185185,0.4117647058823529,0.45901639344262296,0.2978723404255319
+1772,90,random,selected_token_indices,selected_token_indices,True,27,8,2,33,1.0,0.07407407407407407,0.25,0.11428571428571428,0.06060606060606061
+1778,120,random,selected_token_indices,selected_token_indices,True,30,13,1,42,1.0,0.03333333333333333,0.07692307692307693,0.046511627906976744,0.023809523809523808
+1785,163,random,selected_token_indices,selected_token_indices,True,20,12,12,20,1.0,0.6,1.0,0.7499999999999999,0.6
+1789,174,random,selected_token_indices,selected_token_indices,True,38,31,23,46,1.0,0.6052631578947368,0.7419354838709677,0.6666666666666666,0.5
+1791,188,random,selected_token_indices,selected_token_indices,True,32,32,12,52,1.0,0.375,0.375,0.375,0.23076923076923078
+1792,192,random,selected_token_indices,selected_token_indices,True,31,1,1,31,1.0,0.03225806451612903,1.0,0.0625,0.03225806451612903
+1806,257,random,selected_token_indices,selected_token_indices,True,28,7,1,34,1.0,0.03571428571428571,0.14285714285714285,0.05714285714285715,0.029411764705882353
+1808,266,random,selected_token_indices,selected_token_indices,True,30,4,0,34,0.0,0.0,0.0,0.0,0.0
+1811,280,random,selected_token_indices,selected_token_indices,True,28,13,5,36,1.0,0.17857142857142858,0.38461538461538464,0.24390243902439027,0.1388888888888889
+1812,289,random,selected_token_indices,selected_token_indices,True,41,24,3,62,1.0,0.07317073170731707,0.125,0.0923076923076923,0.04838709677419355
+1813,291,random,selected_token_indices,selected_token_indices,True,33,8,1,40,1.0,0.030303030303030304,0.125,0.04878048780487805,0.025
+1818,303,random,selected_token_indices,selected_token_indices,True,30,5,3,32,1.0,0.1,0.6,0.17142857142857143,0.09375
+1819,306,random,selected_token_indices,selected_token_indices,True,32,8,4,36,1.0,0.125,0.5,0.2,0.1111111111111111
+1820,321,random,selected_token_indices,selected_token_indices,True,29,39,25,43,1.0,0.8620689655172413,0.6410256410256411,0.7352941176470588,0.5813953488372093
+1821,330,random,selected_token_indices,selected_token_indices,True,34,28,5,57,1.0,0.14705882352941177,0.17857142857142858,0.16129032258064516,0.08771929824561403
+1822,333,random,selected_token_indices,selected_token_indices,True,27,15,3,39,1.0,0.1111111111111111,0.2,0.14285714285714285,0.07692307692307693
+1827,367,random,selected_token_indices,selected_token_indices,True,13,3,2,14,1.0,0.15384615384615385,0.6666666666666666,0.25,0.14285714285714285
+1837,416,random,selected_token_indices,selected_token_indices,True,25,22,6,41,1.0,0.24,0.2727272727272727,0.2553191489361702,0.14634146341463414
+1838,417,random,selected_token_indices,selected_token_indices,True,32,25,1,56,1.0,0.03125,0.04,0.03508771929824561,0.017857142857142856
+1847,457,random,selected_token_indices,selected_token_indices,True,35,17,8,44,1.0,0.22857142857142856,0.47058823529411764,0.3076923076923077,0.18181818181818182
+1851,475,random,selected_token_indices,selected_token_indices,True,31,11,0,42,0.0,0.0,0.0,0.0,0.0
+1852,479,random,selected_token_indices,selected_token_indices,True,28,17,8,37,1.0,0.2857142857142857,0.47058823529411764,0.35555555555555557,0.21621621621621623
+1855,489,random,selected_token_indices,selected_token_indices,True,33,25,5,53,1.0,0.15151515151515152,0.2,0.17241379310344826,0.09433962264150944
+1857,500,random,selected_token_indices,selected_token_indices,True,18,8,8,18,1.0,0.4444444444444444,1.0,0.6153846153846153,0.4444444444444444
+1858,505,random,selected_token_indices,selected_token_indices,True,30,16,3,43,1.0,0.1,0.1875,0.13043478260869568,0.06976744186046512
+1863,525,random,selected_token_indices,selected_token_indices,True,37,12,9,40,1.0,0.24324324324324326,0.75,0.3673469387755103,0.225
+1878,593,random,selected_token_indices,selected_token_indices,True,29,32,5,56,1.0,0.1724137931034483,0.15625,0.1639344262295082,0.08928571428571429
+1894,691,random,selected_token_indices,selected_token_indices,True,28,11,4,35,1.0,0.14285714285714285,0.36363636363636365,0.2051282051282051,0.11428571428571428
+1895,694,random,selected_token_indices,selected_token_indices,True,32,10,8,34,1.0,0.25,0.8,0.38095238095238093,0.23529411764705882
+1901,709,random,selected_token_indices,selected_token_indices,True,34,15,1,48,1.0,0.029411764705882353,0.06666666666666667,0.04081632653061225,0.020833333333333332
+1912,746,random,selected_token_indices,selected_token_indices,True,34,9,1,42,1.0,0.029411764705882353,0.1111111111111111,0.04651162790697674,0.023809523809523808
+1913,762,random,selected_token_indices,selected_token_indices,True,30,6,4,32,1.0,0.13333333333333333,0.6666666666666666,0.2222222222222222,0.125
+1915,773,random,selected_token_indices,selected_token_indices,True,28,57,13,72,1.0,0.4642857142857143,0.22807017543859648,0.3058823529411765,0.18055555555555555
+1916,774,random,selected_token_indices,selected_token_indices,True,30,24,4,50,1.0,0.13333333333333333,0.16666666666666666,0.14814814814814814,0.08
+1918,785,random,selected_token_indices,selected_token_indices,True,24,8,8,24,1.0,0.3333333333333333,1.0,0.5,0.3333333333333333
+1919,788,random,selected_token_indices,selected_token_indices,True,32,2,1,33,1.0,0.03125,0.5,0.058823529411764705,0.030303030303030304
+1921,791,random,selected_token_indices,selected_token_indices,True,26,13,8,31,1.0,0.3076923076923077,0.6153846153846154,0.4102564102564103,0.25806451612903225
+1932,881,random,selected_token_indices,selected_token_indices,True,39,11,9,41,1.0,0.23076923076923078,0.8181818181818182,0.36000000000000004,0.21951219512195122
+1933,883,random,selected_token_indices,selected_token_indices,True,30,10,0,40,0.0,0.0,0.0,0.0,0.0
+1938,891,random,selected_token_indices,selected_token_indices,True,38,31,7,62,1.0,0.18421052631578946,0.22580645161290322,0.20289855072463767,0.11290322580645161
+1944,938,random,selected_token_indices,selected_token_indices,True,32,9,4,37,1.0,0.125,0.4444444444444444,0.1951219512195122,0.10810810810810811
+1949,954,random,selected_token_indices,selected_token_indices,True,36,29,10,55,1.0,0.2777777777777778,0.3448275862068966,0.3076923076923077,0.18181818181818182
+1959,1005,random,selected_token_indices,selected_token_indices,True,31,6,4,33,1.0,0.12903225806451613,0.6666666666666666,0.2162162162162162,0.12121212121212122
+1963,1018,random,selected_token_indices,selected_token_indices,True,27,19,5,41,1.0,0.18518518518518517,0.2631578947368421,0.21739130434782608,0.12195121951219512
+1966,1025,random,selected_token_indices,selected_token_indices,True,28,25,5,48,1.0,0.17857142857142858,0.2,0.1886792452830189,0.10416666666666667
+1969,1029,random,selected_token_indices,selected_token_indices,True,36,12,2,46,1.0,0.05555555555555555,0.16666666666666666,0.08333333333333333,0.043478260869565216
+1971,1038,random,selected_token_indices,selected_token_indices,True,37,15,6,46,1.0,0.16216216216216217,0.4,0.23076923076923078,0.13043478260869565
+1976,1077,random,selected_token_indices,selected_token_indices,True,28,13,1,40,1.0,0.03571428571428571,0.07692307692307693,0.04878048780487805,0.025
+1984,1114,random,selected_token_indices,selected_token_indices,True,33,26,7,52,1.0,0.21212121212121213,0.2692307692307692,0.23728813559322037,0.1346153846153846
+1985,1117,random,selected_token_indices,selected_token_indices,True,37,18,17,38,1.0,0.4594594594594595,0.9444444444444444,0.6181818181818182,0.4473684210526316
+1988,1142,random,selected_token_indices,selected_token_indices,True,28,13,3,38,1.0,0.10714285714285714,0.23076923076923078,0.14634146341463414,0.07894736842105263
+1995,1155,random,selected_token_indices,selected_token_indices,True,29,88,28,89,1.0,0.9655172413793104,0.3181818181818182,0.4786324786324786,0.3146067415730337
+1998,1183,random,selected_token_indices,selected_token_indices,True,35,14,3,46,1.0,0.08571428571428572,0.21428571428571427,0.12244897959183673,0.06521739130434782
+2001,1206,random,selected_token_indices,selected_token_indices,True,25,11,1,35,1.0,0.04,0.09090909090909091,0.05555555555555555,0.02857142857142857
+2004,1214,random,selected_token_indices,selected_token_indices,True,33,37,8,62,1.0,0.24242424242424243,0.21621621621621623,0.22857142857142856,0.12903225806451613
+2007,1241,random,selected_token_indices,selected_token_indices,True,27,74,10,91,1.0,0.37037037037037035,0.13513513513513514,0.198019801980198,0.10989010989010989
+2014,1262,random,selected_token_indices,selected_token_indices,True,35,29,3,61,1.0,0.08571428571428572,0.10344827586206896,0.09375,0.04918032786885246
+2016,1270,random,selected_token_indices,selected_token_indices,True,14,14,13,15,1.0,0.9285714285714286,0.9285714285714286,0.9285714285714286,0.8666666666666667
+2017,1271,random,selected_token_indices,selected_token_indices,True,16,5,4,17,1.0,0.25,0.8,0.38095238095238093,0.23529411764705882
+2018,1272,random,selected_token_indices,selected_token_indices,True,34,26,16,44,1.0,0.47058823529411764,0.6153846153846154,0.5333333333333333,0.36363636363636365
+2020,1285,random,selected_token_indices,selected_token_indices,True,30,2,2,30,1.0,0.06666666666666667,1.0,0.125,0.06666666666666667
+2024,1294,random,selected_token_indices,selected_token_indices,True,15,9,9,15,1.0,0.6,1.0,0.7499999999999999,0.6
+2025,1305,random,selected_token_indices,selected_token_indices,True,17,5,4,18,1.0,0.23529411764705882,0.8,0.3636363636363636,0.2222222222222222
+2027,1314,random,selected_token_indices,selected_token_indices,True,29,17,7,39,1.0,0.2413793103448276,0.4117647058823529,0.3043478260869565,0.1794871794871795
+2034,1349,random,selected_token_indices,selected_token_indices,True,31,6,3,34,1.0,0.0967741935483871,0.5,0.16216216216216214,0.08823529411764706
+2037,1361,random,selected_token_indices,selected_token_indices,True,40,3,0,43,0.0,0.0,0.0,0.0,0.0
+2047,1462,random,selected_token_indices,selected_token_indices,True,28,27,20,35,1.0,0.7142857142857143,0.7407407407407407,0.7272727272727273,0.5714285714285714
+2049,1467,random,selected_token_indices,selected_token_indices,True,26,5,4,27,1.0,0.15384615384615385,0.8,0.25806451612903225,0.14814814814814814
+2058,1503,random,selected_token_indices,selected_token_indices,True,27,6,1,32,1.0,0.037037037037037035,0.16666666666666666,0.06060606060606061,0.03125
+2060,1513,random,selected_token_indices,selected_token_indices,True,29,59,15,73,1.0,0.5172413793103449,0.2542372881355932,0.3409090909090909,0.2054794520547945
+2069,1567,random,selected_token_indices,selected_token_indices,True,18,3,3,18,1.0,0.16666666666666666,1.0,0.2857142857142857,0.16666666666666666
+2074,1592,random,selected_token_indices,selected_token_indices,True,28,32,8,52,1.0,0.2857142857142857,0.25,0.26666666666666666,0.15384615384615385
+2076,1610,random,selected_token_indices,selected_token_indices,True,29,19,16,32,1.0,0.5517241379310345,0.8421052631578947,0.6666666666666666,0.5
+2077,1611,random,selected_token_indices,selected_token_indices,True,30,38,14,54,1.0,0.4666666666666667,0.3684210526315789,0.4117647058823529,0.25925925925925924
+2079,1615,random,selected_token_indices,selected_token_indices,True,42,17,8,51,1.0,0.19047619047619047,0.47058823529411764,0.27118644067796605,0.1568627450980392
+2087,1655,random,selected_token_indices,selected_token_indices,True,27,8,4,31,1.0,0.14814814814814814,0.5,0.22857142857142856,0.12903225806451613
+2088,1656,random,selected_token_indices,selected_token_indices,True,32,10,4,38,1.0,0.125,0.4,0.19047619047619047,0.10526315789473684
+2090,1667,random,selected_token_indices,selected_token_indices,True,26,26,9,43,1.0,0.34615384615384615,0.34615384615384615,0.34615384615384615,0.20930232558139536
+2098,1716,random,selected_token_indices,selected_token_indices,True,30,11,2,39,1.0,0.06666666666666667,0.18181818181818182,0.0975609756097561,0.05128205128205128
+2107,1741,random,selected_token_indices,selected_token_indices,True,57,31,30,58,1.0,0.5263157894736842,0.967741935483871,0.6818181818181819,0.5172413793103449
+2112,1775,random,selected_token_indices,selected_token_indices,True,18,2,2,18,1.0,0.1111111111111111,1.0,0.19999999999999998,0.1111111111111111
+2118,1821,random,selected_token_indices,selected_token_indices,True,32,9,1,40,1.0,0.03125,0.1111111111111111,0.04878048780487805,0.025
+2133,1902,random,selected_token_indices,selected_token_indices,True,19,19,18,20,1.0,0.9473684210526315,0.9473684210526315,0.9473684210526315,0.9
+2140,1929,random,selected_token_indices,selected_token_indices,True,31,6,2,35,1.0,0.06451612903225806,0.3333333333333333,0.1081081081081081,0.05714285714285714
+2150,1977,random,selected_token_indices,selected_token_indices,True,30,19,3,46,1.0,0.1,0.15789473684210525,0.12244897959183673,0.06521739130434782
+2153,1980,random,selected_token_indices,selected_token_indices,True,33,8,2,39,1.0,0.06060606060606061,0.25,0.0975609756097561,0.05128205128205128
+2154,1988,random,selected_token_indices,selected_token_indices,True,33,14,2,45,1.0,0.06060606060606061,0.14285714285714285,0.0851063829787234,0.044444444444444446
+2162,2023,random,selected_token_indices,selected_token_indices,True,33,11,4,40,1.0,0.12121212121212122,0.36363636363636365,0.18181818181818182,0.1
+2164,2040,random,selected_token_indices,selected_token_indices,True,16,5,5,16,1.0,0.3125,1.0,0.47619047619047616,0.3125
+2168,2062,random,selected_token_indices,selected_token_indices,True,27,10,1,36,1.0,0.037037037037037035,0.1,0.05405405405405406,0.027777777777777776
+2171,2087,random,selected_token_indices,selected_token_indices,True,21,21,20,22,1.0,0.9523809523809523,0.9523809523809523,0.9523809523809523,0.9090909090909091
+2172,2088,random,selected_token_indices,selected_token_indices,True,18,10,10,18,1.0,0.5555555555555556,1.0,0.7142857142857143,0.5555555555555556
+2176,2097,random,selected_token_indices,selected_token_indices,True,17,17,16,18,1.0,0.9411764705882353,0.9411764705882353,0.9411764705882353,0.8888888888888888
+2181,2128,random,selected_token_indices,selected_token_indices,True,31,16,3,44,1.0,0.0967741935483871,0.1875,0.12765957446808507,0.06818181818181818
+1754,8,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,5,2,19,1.0,0.125,0.4,0.19047619047619047,0.10526315789473684
+1756,12,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,16,16,16,1.0,1.0,1.0,1.0,1.0
+1759,22,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,37,9,0,46,0.0,0.0,0.0,0.0,0.0
+1764,54,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,11,13,11,13,1.0,1.0,0.8461538461538461,0.9166666666666666,0.8461538461538461
+1768,66,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,25,4,1,28,1.0,0.04,0.25,0.06896551724137932,0.03571428571428571
+1771,81,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,43,34,13,64,1.0,0.3023255813953488,0.38235294117647056,0.33766233766233766,0.203125
+1772,90,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,42,8,6,44,1.0,0.14285714285714285,0.75,0.24,0.13636363636363635
+1778,120,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,41,13,10,44,1.0,0.24390243902439024,0.7692307692307693,0.37037037037037035,0.22727272727272727
+1785,163,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,18,12,10,20,1.0,0.5555555555555556,0.8333333333333334,0.6666666666666667,0.5
+1789,174,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,27,31,9,49,1.0,0.3333333333333333,0.2903225806451613,0.3103448275862069,0.1836734693877551
+1791,188,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,33,32,20,45,1.0,0.6060606060606061,0.625,0.6153846153846154,0.4444444444444444
+1792,192,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,31,1,1,31,1.0,0.03225806451612903,1.0,0.0625,0.03225806451612903
+1806,257,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,44,7,6,45,1.0,0.13636363636363635,0.8571428571428571,0.2352941176470588,0.13333333333333333
+1808,266,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,40,4,3,41,1.0,0.075,0.75,0.13636363636363635,0.07317073170731707
+1811,280,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,66,13,1,78,1.0,0.015151515151515152,0.07692307692307693,0.02531645569620253,0.01282051282051282
+1812,289,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,53,24,15,62,1.0,0.2830188679245283,0.625,0.38961038961038963,0.24193548387096775
+1813,291,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,57,8,0,65,0.0,0.0,0.0,0.0,0.0
+1818,303,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,40,5,0,45,0.0,0.0,0.0,0.0,0.0
+1819,306,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,23,8,0,31,0.0,0.0,0.0,0.0,0.0
+1820,321,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,24,39,21,42,1.0,0.875,0.5384615384615384,0.6666666666666667,0.5
+1821,330,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,32,28,8,52,1.0,0.25,0.2857142857142857,0.26666666666666666,0.15384615384615385
+1822,333,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,57,15,4,68,1.0,0.07017543859649122,0.26666666666666666,0.11111111111111112,0.058823529411764705
+1827,367,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,12,3,3,12,1.0,0.25,1.0,0.4,0.25
+1837,416,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,36,22,7,51,1.0,0.19444444444444445,0.3181818181818182,0.2413793103448276,0.13725490196078433
+1838,417,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,75,25,11,89,1.0,0.14666666666666667,0.44,0.22,0.12359550561797752
+1847,457,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,41,17,4,54,1.0,0.0975609756097561,0.23529411764705882,0.13793103448275862,0.07407407407407407
+1851,475,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,49,11,8,52,1.0,0.16326530612244897,0.7272727272727273,0.26666666666666666,0.15384615384615385
+1852,479,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,38,17,8,47,1.0,0.21052631578947367,0.47058823529411764,0.2909090909090909,0.1702127659574468
+1855,489,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,55,25,5,75,1.0,0.09090909090909091,0.2,0.12500000000000003,0.06666666666666667
+1857,500,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,8,7,17,1.0,0.4375,0.875,0.5833333333333334,0.4117647058823529
+1858,505,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,58,16,7,67,1.0,0.1206896551724138,0.4375,0.1891891891891892,0.1044776119402985
+1863,525,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,26,12,12,26,1.0,0.46153846153846156,1.0,0.631578947368421,0.46153846153846156
+1878,593,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,43,32,10,65,1.0,0.23255813953488372,0.3125,0.2666666666666667,0.15384615384615385
+1894,691,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,62,11,6,67,1.0,0.0967741935483871,0.5454545454545454,0.1643835616438356,0.08955223880597014
+1895,694,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,32,10,6,36,1.0,0.1875,0.6,0.2857142857142857,0.16666666666666666
+1901,709,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,59,15,3,71,1.0,0.05084745762711865,0.2,0.08108108108108107,0.04225352112676056
+1912,746,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,40,9,6,43,1.0,0.15,0.6666666666666666,0.24489795918367346,0.13953488372093023
+1913,762,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,37,6,0,43,0.0,0.0,0.0,0.0,0.0
+1915,773,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,45,57,23,79,1.0,0.5111111111111111,0.40350877192982454,0.45098039215686275,0.2911392405063291
+1916,774,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,95,24,21,98,1.0,0.22105263157894736,0.875,0.3529411764705882,0.21428571428571427
+1918,785,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,13,8,1,20,1.0,0.07692307692307693,0.125,0.09523809523809525,0.05
+1919,788,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,33,2,1,34,1.0,0.030303030303030304,0.5,0.05714285714285715,0.029411764705882353
+1921,791,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,33,13,9,37,1.0,0.2727272727272727,0.6923076923076923,0.391304347826087,0.24324324324324326
+1932,881,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,43,11,4,50,1.0,0.09302325581395349,0.36363636363636365,0.14814814814814814,0.08
+1933,883,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,53,10,9,54,1.0,0.16981132075471697,0.9,0.2857142857142857,0.16666666666666666
+1938,891,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,42,31,14,59,1.0,0.3333333333333333,0.45161290322580644,0.3835616438356164,0.23728813559322035
+1944,938,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,45,9,4,50,1.0,0.08888888888888889,0.4444444444444444,0.14814814814814814,0.08
+1949,954,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,35,29,17,47,1.0,0.4857142857142857,0.5862068965517241,0.53125,0.3617021276595745
+1959,1005,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,32,6,6,32,1.0,0.1875,1.0,0.3157894736842105,0.1875
+1963,1018,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,40,19,11,48,1.0,0.275,0.5789473684210527,0.37288135593220345,0.22916666666666666
+1966,1025,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,59,25,6,78,1.0,0.1016949152542373,0.24,0.14285714285714285,0.07692307692307693
+1969,1029,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,63,12,2,73,1.0,0.031746031746031744,0.16666666666666666,0.05333333333333334,0.0273972602739726
+1971,1038,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,54,15,3,66,1.0,0.05555555555555555,0.2,0.08695652173913045,0.045454545454545456
+1976,1077,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,55,13,1,67,1.0,0.01818181818181818,0.07692307692307693,0.02941176470588235,0.014925373134328358
+1984,1114,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,46,26,7,65,1.0,0.15217391304347827,0.2692307692307692,0.19444444444444445,0.1076923076923077
+1985,1117,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,20,18,10,28,1.0,0.5,0.5555555555555556,0.5263157894736842,0.35714285714285715
+1988,1142,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,47,13,2,58,1.0,0.0425531914893617,0.15384615384615385,0.06666666666666667,0.034482758620689655
+1995,1155,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,53,88,53,88,1.0,1.0,0.6022727272727273,0.75177304964539,0.6022727272727273
+1998,1183,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,35,14,5,44,1.0,0.14285714285714285,0.35714285714285715,0.20408163265306123,0.11363636363636363
+2001,1206,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,95,11,5,101,1.0,0.05263157894736842,0.45454545454545453,0.09433962264150943,0.04950495049504951
+2004,1214,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,47,37,7,77,1.0,0.14893617021276595,0.1891891891891892,0.16666666666666666,0.09090909090909091
+2007,1241,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,57,74,28,103,1.0,0.49122807017543857,0.3783783783783784,0.42748091603053434,0.27184466019417475
+2014,1262,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,65,29,13,81,1.0,0.2,0.4482758620689655,0.27659574468085113,0.16049382716049382
+2016,1270,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,11,14,11,14,1.0,1.0,0.7857142857142857,0.88,0.7857142857142857
+2017,1271,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,5,5,16,1.0,0.3125,1.0,0.47619047619047616,0.3125
+2018,1272,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,43,26,18,51,1.0,0.4186046511627907,0.6923076923076923,0.5217391304347826,0.35294117647058826
+2020,1285,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,33,2,2,33,1.0,0.06060606060606061,1.0,0.1142857142857143,0.06060606060606061
+2024,1294,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,15,9,9,15,1.0,0.6,1.0,0.7499999999999999,0.6
+2025,1305,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,10,5,2,13,1.0,0.2,0.4,0.26666666666666666,0.15384615384615385
+2027,1314,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,42,17,5,54,1.0,0.11904761904761904,0.29411764705882354,0.16949152542372883,0.09259259259259259
+2034,1349,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,57,6,0,63,0.0,0.0,0.0,0.0,0.0
+2037,1361,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,70,3,0,73,0.0,0.0,0.0,0.0,0.0
+2047,1462,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,30,27,22,35,1.0,0.7333333333333333,0.8148148148148148,0.7719298245614035,0.6285714285714286
+2049,1467,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,24,5,3,26,1.0,0.125,0.6,0.20689655172413793,0.11538461538461539
+2058,1503,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,55,6,0,61,0.0,0.0,0.0,0.0,0.0
+2060,1513,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,55,59,27,87,1.0,0.4909090909090909,0.4576271186440678,0.4736842105263158,0.3103448275862069
+2069,1567,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,15,3,1,17,1.0,0.06666666666666667,0.3333333333333333,0.1111111111111111,0.058823529411764705
+2074,1592,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,53,32,0,85,0.0,0.0,0.0,0.0,0.0
+2076,1610,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,26,19,14,31,1.0,0.5384615384615384,0.7368421052631579,0.6222222222222222,0.45161290322580644
+2077,1611,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,34,38,26,46,1.0,0.7647058823529411,0.6842105263157895,0.7222222222222222,0.5652173913043478
+2079,1615,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,34,17,0,51,0.0,0.0,0.0,0.0,0.0
+2087,1655,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,46,8,3,51,1.0,0.06521739130434782,0.375,0.11111111111111109,0.058823529411764705
+2088,1656,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,33,10,6,37,1.0,0.18181818181818182,0.6,0.27906976744186046,0.16216216216216217
+2090,1667,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,51,26,6,71,1.0,0.11764705882352941,0.23076923076923078,0.15584415584415587,0.08450704225352113
+2098,1716,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,38,11,1,48,1.0,0.02631578947368421,0.09090909090909091,0.04081632653061224,0.020833333333333332
+2107,1741,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,21,31,3,49,1.0,0.14285714285714285,0.0967741935483871,0.11538461538461538,0.061224489795918366
+2112,1775,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,2,2,16,1.0,0.125,1.0,0.2222222222222222,0.125
+2118,1821,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,38,9,8,39,1.0,0.21052631578947367,0.8888888888888888,0.3404255319148936,0.20512820512820512
+2133,1902,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,19,16,19,1.0,1.0,0.8421052631578947,0.9142857142857143,0.8421052631578947
+2140,1929,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,29,6,4,31,1.0,0.13793103448275862,0.6666666666666666,0.2285714285714286,0.12903225806451613
+2150,1977,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,44,19,6,57,1.0,0.13636363636363635,0.3157894736842105,0.19047619047619047,0.10526315789473684
+2153,1980,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,59,8,5,62,1.0,0.0847457627118644,0.625,0.14925373134328357,0.08064516129032258
+2154,1988,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,48,14,2,60,1.0,0.041666666666666664,0.14285714285714285,0.06451612903225806,0.03333333333333333
+2162,2023,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,44,11,7,48,1.0,0.1590909090909091,0.6363636363636364,0.2545454545454546,0.14583333333333334
+2164,2040,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,12,5,4,13,1.0,0.3333333333333333,0.8,0.47058823529411764,0.3076923076923077
+2168,2062,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,63,10,5,68,1.0,0.07936507936507936,0.5,0.13698630136986303,0.07352941176470588
+2171,2087,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,17,21,17,21,1.0,1.0,0.8095238095238095,0.8947368421052632,0.8095238095238095
+2172,2088,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,16,10,8,18,1.0,0.5,0.8,0.6153846153846154,0.4444444444444444
+2176,2097,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,15,17,15,17,1.0,1.0,0.8823529411764706,0.9375,0.8823529411764706
+2181,2128,tfidf,merged_span_token_start_indices + merged_span_token_end_indices (inclusive end; inferred),selected_token_indices,True,40,16,12,44,1.0,0.3,0.75,0.4285714285714285,0.2727272727272727
+1754,8,attention,selected_token_indices,selected_token_indices,True,16,5,1,20,1.0,0.0625,0.2,0.09523809523809523,0.05
+1756,12,attention,selected_token_indices,selected_token_indices,True,10,16,9,17,1.0,0.9,0.5625,0.6923076923076923,0.5294117647058824
+1759,22,attention,selected_token_indices,selected_token_indices,True,55,9,4,60,1.0,0.07272727272727272,0.4444444444444444,0.125,0.06666666666666667
+1764,54,attention,selected_token_indices,selected_token_indices,True,8,13,7,14,1.0,0.875,0.5384615384615384,0.6666666666666667,0.5
+1768,66,attention,selected_token_indices,selected_token_indices,True,22,4,3,23,1.0,0.13636363636363635,0.75,0.23076923076923075,0.13043478260869565
+1771,81,attention,selected_token_indices,selected_token_indices,True,47,34,22,59,1.0,0.46808510638297873,0.6470588235294118,0.54320987654321,0.3728813559322034
+1772,90,attention,selected_token_indices,selected_token_indices,True,59,8,4,63,1.0,0.06779661016949153,0.5,0.11940298507462686,0.06349206349206349
+1778,120,attention,selected_token_indices,selected_token_indices,True,116,13,7,122,1.0,0.0603448275862069,0.5384615384615384,0.10852713178294575,0.05737704918032787
+1785,163,attention,selected_token_indices,selected_token_indices,True,12,12,7,17,1.0,0.5833333333333334,0.5833333333333334,0.5833333333333334,0.4117647058823529
+1789,174,attention,selected_token_indices,selected_token_indices,True,37,31,17,51,1.0,0.4594594594594595,0.5483870967741935,0.5,0.3333333333333333
+1791,188,attention,selected_token_indices,selected_token_indices,True,41,32,20,53,1.0,0.4878048780487805,0.625,0.547945205479452,0.37735849056603776
+1792,192,attention,selected_token_indices,selected_token_indices,True,32,1,1,32,1.0,0.03125,1.0,0.06060606060606061,0.03125
+1806,257,attention,selected_token_indices,selected_token_indices,True,98,7,3,102,1.0,0.030612244897959183,0.42857142857142855,0.05714285714285714,0.029411764705882353
+1808,266,attention,selected_token_indices,selected_token_indices,True,62,4,2,64,1.0,0.03225806451612903,0.5,0.06060606060606061,0.03125
+1811,280,attention,selected_token_indices,selected_token_indices,True,97,13,9,101,1.0,0.09278350515463918,0.6923076923076923,0.16363636363636366,0.0891089108910891
+1812,289,attention,selected_token_indices,selected_token_indices,True,97,24,16,105,1.0,0.16494845360824742,0.6666666666666666,0.2644628099173554,0.1523809523809524
+1813,291,attention,selected_token_indices,selected_token_indices,True,63,8,6,65,1.0,0.09523809523809523,0.75,0.16901408450704225,0.09230769230769231
+1818,303,attention,selected_token_indices,selected_token_indices,True,42,5,2,45,1.0,0.047619047619047616,0.4,0.0851063829787234,0.044444444444444446
+1819,306,attention,selected_token_indices,selected_token_indices,True,47,8,7,48,1.0,0.14893617021276595,0.875,0.25454545454545446,0.14583333333333334
+1820,321,attention,selected_token_indices,selected_token_indices,True,26,39,23,42,1.0,0.8846153846153846,0.5897435897435898,0.7076923076923076,0.5476190476190477
+1821,330,attention,selected_token_indices,selected_token_indices,True,84,28,11,101,1.0,0.13095238095238096,0.39285714285714285,0.19642857142857142,0.10891089108910891
+1822,333,attention,selected_token_indices,selected_token_indices,True,48,15,9,54,1.0,0.1875,0.6,0.2857142857142857,0.16666666666666666
+1827,367,attention,selected_token_indices,selected_token_indices,True,8,3,2,9,1.0,0.25,0.6666666666666666,0.36363636363636365,0.2222222222222222
+1837,416,attention,selected_token_indices,selected_token_indices,True,66,22,9,79,1.0,0.13636363636363635,0.4090909090909091,0.20454545454545456,0.11392405063291139
+1838,417,attention,selected_token_indices,selected_token_indices,True,115,25,17,123,1.0,0.14782608695652175,0.68,0.24285714285714288,0.13821138211382114
+1847,457,attention,selected_token_indices,selected_token_indices,True,56,17,11,62,1.0,0.19642857142857142,0.6470588235294118,0.3013698630136986,0.1774193548387097
+1851,475,attention,selected_token_indices,selected_token_indices,True,67,11,5,73,1.0,0.07462686567164178,0.45454545454545453,0.1282051282051282,0.0684931506849315
+1852,479,attention,selected_token_indices,selected_token_indices,True,32,17,12,37,1.0,0.375,0.7058823529411765,0.48979591836734687,0.32432432432432434
+1855,489,attention,selected_token_indices,selected_token_indices,True,60,25,15,70,1.0,0.25,0.6,0.35294117647058826,0.21428571428571427
+1857,500,attention,selected_token_indices,selected_token_indices,True,11,8,4,15,1.0,0.36363636363636365,0.5,0.4210526315789474,0.26666666666666666
+1858,505,attention,selected_token_indices,selected_token_indices,True,76,16,8,84,1.0,0.10526315789473684,0.5,0.17391304347826086,0.09523809523809523
+1863,525,attention,selected_token_indices,selected_token_indices,True,27,12,7,32,1.0,0.25925925925925924,0.5833333333333334,0.358974358974359,0.21875
+1878,593,attention,selected_token_indices,selected_token_indices,True,121,32,16,137,1.0,0.1322314049586777,0.5,0.20915032679738563,0.11678832116788321
+1894,691,attention,selected_token_indices,selected_token_indices,True,80,11,7,84,1.0,0.0875,0.6363636363636364,0.15384615384615383,0.08333333333333333
+1895,694,attention,selected_token_indices,selected_token_indices,True,28,10,5,33,1.0,0.17857142857142858,0.5,0.2631578947368421,0.15151515151515152
+1901,709,attention,selected_token_indices,selected_token_indices,True,102,15,12,105,1.0,0.11764705882352941,0.8,0.20512820512820512,0.11428571428571428
+1912,746,attention,selected_token_indices,selected_token_indices,True,69,9,9,69,1.0,0.13043478260869565,1.0,0.23076923076923078,0.13043478260869565
+1913,762,attention,selected_token_indices,selected_token_indices,True,46,6,4,48,1.0,0.08695652173913043,0.6666666666666666,0.15384615384615383,0.08333333333333333
+1915,773,attention,selected_token_indices,selected_token_indices,True,65,57,38,84,1.0,0.5846153846153846,0.6666666666666666,0.6229508196721312,0.4523809523809524
+1916,774,attention,selected_token_indices,selected_token_indices,True,108,24,14,118,1.0,0.12962962962962962,0.5833333333333334,0.2121212121212121,0.11864406779661017
+1918,785,attention,selected_token_indices,selected_token_indices,True,14,8,3,19,1.0,0.21428571428571427,0.375,0.2727272727272727,0.15789473684210525
+1919,788,attention,selected_token_indices,selected_token_indices,True,39,2,2,39,1.0,0.05128205128205128,1.0,0.09756097560975609,0.05128205128205128
+1921,791,attention,selected_token_indices,selected_token_indices,True,22,13,6,29,1.0,0.2727272727272727,0.46153846153846156,0.3428571428571428,0.20689655172413793
+1932,881,attention,selected_token_indices,selected_token_indices,True,65,11,10,66,1.0,0.15384615384615385,0.9090909090909091,0.26315789473684215,0.15151515151515152
+1933,883,attention,selected_token_indices,selected_token_indices,True,100,10,4,106,1.0,0.04,0.4,0.07272727272727272,0.03773584905660377
+1938,891,attention,selected_token_indices,selected_token_indices,True,56,31,18,69,1.0,0.32142857142857145,0.5806451612903226,0.41379310344827586,0.2608695652173913
+1944,938,attention,selected_token_indices,selected_token_indices,True,62,9,8,63,1.0,0.12903225806451613,0.8888888888888888,0.22535211267605634,0.12698412698412698
+1949,954,attention,selected_token_indices,selected_token_indices,True,44,29,14,59,1.0,0.3181818181818182,0.4827586206896552,0.3835616438356164,0.23728813559322035
+1959,1005,attention,selected_token_indices,selected_token_indices,True,25,6,4,27,1.0,0.16,0.6666666666666666,0.25806451612903225,0.14814814814814814
+1963,1018,attention,selected_token_indices,selected_token_indices,True,44,19,13,50,1.0,0.29545454545454547,0.6842105263157895,0.41269841269841273,0.26
+1966,1025,attention,selected_token_indices,selected_token_indices,True,113,25,14,124,1.0,0.12389380530973451,0.56,0.20289855072463767,0.11290322580645161
+1969,1029,attention,selected_token_indices,selected_token_indices,True,106,12,8,110,1.0,0.07547169811320754,0.6666666666666666,0.13559322033898305,0.07272727272727272
+1971,1038,attention,selected_token_indices,selected_token_indices,True,98,15,13,100,1.0,0.1326530612244898,0.8666666666666667,0.23008849557522126,0.13
+1976,1077,attention,selected_token_indices,selected_token_indices,True,94,13,8,99,1.0,0.0851063829787234,0.6153846153846154,0.14953271028037382,0.08080808080808081
+1984,1114,attention,selected_token_indices,selected_token_indices,True,59,26,11,74,1.0,0.1864406779661017,0.4230769230769231,0.25882352941176473,0.14864864864864866
+1985,1117,attention,selected_token_indices,selected_token_indices,True,25,18,7,36,1.0,0.28,0.3888888888888889,0.32558139534883723,0.19444444444444445
+1988,1142,attention,selected_token_indices,selected_token_indices,True,64,13,9,68,1.0,0.140625,0.6923076923076923,0.23376623376623376,0.1323529411764706
+1995,1155,attention,selected_token_indices,selected_token_indices,True,53,88,52,89,1.0,0.9811320754716981,0.5909090909090909,0.7375886524822695,0.5842696629213483
+1998,1183,attention,selected_token_indices,selected_token_indices,True,52,14,9,57,1.0,0.17307692307692307,0.6428571428571429,0.27272727272727276,0.15789473684210525
+2001,1206,attention,selected_token_indices,selected_token_indices,True,118,11,4,125,1.0,0.03389830508474576,0.36363636363636365,0.06201550387596899,0.032
+2004,1214,attention,selected_token_indices,selected_token_indices,True,88,37,17,108,1.0,0.19318181818181818,0.4594594594594595,0.272,0.1574074074074074
+2007,1241,attention,selected_token_indices,selected_token_indices,True,118,74,37,155,1.0,0.3135593220338983,0.5,0.38541666666666663,0.23870967741935484
+2014,1262,attention,selected_token_indices,selected_token_indices,True,89,29,17,101,1.0,0.19101123595505617,0.5862068965517241,0.288135593220339,0.16831683168316833
+2016,1270,attention,selected_token_indices,selected_token_indices,True,8,14,7,15,1.0,0.875,0.5,0.6363636363636364,0.4666666666666667
+2017,1271,attention,selected_token_indices,selected_token_indices,True,10,5,3,12,1.0,0.3,0.6,0.4,0.25
+2018,1272,attention,selected_token_indices,selected_token_indices,True,50,26,18,58,1.0,0.36,0.6923076923076923,0.47368421052631576,0.3103448275862069
+2020,1285,attention,selected_token_indices,selected_token_indices,True,25,2,0,27,0.0,0.0,0.0,0.0,0.0
+2024,1294,attention,selected_token_indices,selected_token_indices,True,9,9,6,12,1.0,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.5
+2025,1305,attention,selected_token_indices,selected_token_indices,True,10,5,2,13,1.0,0.2,0.4,0.26666666666666666,0.15384615384615385
+2027,1314,attention,selected_token_indices,selected_token_indices,True,41,17,9,49,1.0,0.21951219512195122,0.5294117647058824,0.3103448275862069,0.1836734693877551
+2034,1349,attention,selected_token_indices,selected_token_indices,True,88,6,5,89,1.0,0.056818181818181816,0.8333333333333334,0.10638297872340426,0.056179775280898875
+2037,1361,attention,selected_token_indices,selected_token_indices,True,103,3,1,105,1.0,0.009708737864077669,0.3333333333333333,0.018867924528301886,0.009523809523809525
+2047,1462,attention,selected_token_indices,selected_token_indices,True,23,27,16,34,1.0,0.6956521739130435,0.5925925925925926,0.6399999999999999,0.47058823529411764
+2049,1467,attention,selected_token_indices,selected_token_indices,True,21,5,2,24,1.0,0.09523809523809523,0.4,0.15384615384615385,0.08333333333333333
+2058,1503,attention,selected_token_indices,selected_token_indices,True,103,6,6,103,1.0,0.05825242718446602,1.0,0.11009174311926606,0.05825242718446602
+2060,1513,attention,selected_token_indices,selected_token_indices,True,85,59,32,112,1.0,0.3764705882352941,0.5423728813559322,0.4444444444444444,0.2857142857142857
+2069,1567,attention,selected_token_indices,selected_token_indices,True,11,3,2,12,1.0,0.18181818181818182,0.6666666666666666,0.28571428571428575,0.16666666666666666
+2074,1592,attention,selected_token_indices,selected_token_indices,True,74,32,19,87,1.0,0.25675675675675674,0.59375,0.3584905660377358,0.21839080459770116
+2076,1610,attention,selected_token_indices,selected_token_indices,True,21,19,9,31,1.0,0.42857142857142855,0.47368421052631576,0.45,0.2903225806451613
+2077,1611,attention,selected_token_indices,selected_token_indices,True,35,38,20,53,1.0,0.5714285714285714,0.5263157894736842,0.547945205479452,0.37735849056603776
+2079,1615,attention,selected_token_indices,selected_token_indices,True,59,17,11,65,1.0,0.1864406779661017,0.6470588235294118,0.2894736842105263,0.16923076923076924
+2087,1655,attention,selected_token_indices,selected_token_indices,True,48,8,4,52,1.0,0.08333333333333333,0.5,0.14285714285714285,0.07692307692307693
+2088,1656,attention,selected_token_indices,selected_token_indices,True,47,10,7,50,1.0,0.14893617021276595,0.7,0.24561403508771928,0.14
+2090,1667,attention,selected_token_indices,selected_token_indices,True,80,26,15,91,1.0,0.1875,0.5769230769230769,0.2830188679245283,0.16483516483516483
+2098,1716,attention,selected_token_indices,selected_token_indices,True,71,11,6,76,1.0,0.08450704225352113,0.5454545454545454,0.14634146341463414,0.07894736842105263
+2107,1741,attention,selected_token_indices,selected_token_indices,True,37,31,24,44,1.0,0.6486486486486487,0.7741935483870968,0.7058823529411764,0.5454545454545454
+2112,1775,attention,selected_token_indices,selected_token_indices,True,11,2,2,11,1.0,0.18181818181818182,1.0,0.3076923076923077,0.18181818181818182
+2118,1821,attention,selected_token_indices,selected_token_indices,True,58,9,7,60,1.0,0.1206896551724138,0.7777777777777778,0.208955223880597,0.11666666666666667
+2133,1902,attention,selected_token_indices,selected_token_indices,True,11,19,10,20,1.0,0.9090909090909091,0.5263157894736842,0.6666666666666666,0.5
+2140,1929,attention,selected_token_indices,selected_token_indices,True,52,6,2,56,1.0,0.038461538461538464,0.3333333333333333,0.06896551724137931,0.03571428571428571
+2150,1977,attention,selected_token_indices,selected_token_indices,True,61,19,11,69,1.0,0.18032786885245902,0.5789473684210527,0.275,0.15942028985507245
+2153,1980,attention,selected_token_indices,selected_token_indices,True,118,8,7,119,1.0,0.059322033898305086,0.875,0.11111111111111112,0.058823529411764705
+2154,1988,attention,selected_token_indices,selected_token_indices,True,77,14,8,83,1.0,0.1038961038961039,0.5714285714285714,0.17582417582417584,0.0963855421686747
+2162,2023,attention,selected_token_indices,selected_token_indices,True,50,11,3,58,1.0,0.06,0.2727272727272727,0.09836065573770492,0.05172413793103448
+2164,2040,attention,selected_token_indices,selected_token_indices,True,10,5,1,14,1.0,0.1,0.2,0.13333333333333333,0.07142857142857142
+2168,2062,attention,selected_token_indices,selected_token_indices,True,60,10,6,64,1.0,0.1,0.6,0.17142857142857143,0.09375
+2171,2087,attention,selected_token_indices,selected_token_indices,True,13,21,12,22,1.0,0.9230769230769231,0.5714285714285714,0.7058823529411765,0.5454545454545454
+2172,2088,attention,selected_token_indices,selected_token_indices,True,11,10,6,15,1.0,0.5454545454545454,0.6,0.5714285714285713,0.4
+2176,2097,attention,selected_token_indices,selected_token_indices,True,10,17,9,18,1.0,0.9,0.5294117647058824,0.6666666666666667,0.5
+2181,2128,attention,selected_token_indices,selected_token_indices,True,62,16,6,72,1.0,0.0967741935483871,0.375,0.15384615384615383,0.08333333333333333
+1754,8,ig,selected_token_indices,selected_token_indices,True,12,5,2,15,1.0,0.16666666666666666,0.4,0.23529411764705882,0.13333333333333333
+1756,12,ig,selected_token_indices,selected_token_indices,True,8,16,7,17,1.0,0.875,0.4375,0.5833333333333334,0.4117647058823529
+1759,22,ig,selected_token_indices,selected_token_indices,True,31,9,4,36,1.0,0.12903225806451613,0.4444444444444444,0.19999999999999998,0.1111111111111111
+1764,54,ig,selected_token_indices,selected_token_indices,True,7,13,7,13,1.0,1.0,0.5384615384615384,0.7000000000000001,0.5384615384615384
+1768,66,ig,selected_token_indices,selected_token_indices,True,17,4,0,21,0.0,0.0,0.0,0.0,0.0
+1771,81,ig,selected_token_indices,selected_token_indices,True,34,34,16,52,1.0,0.47058823529411764,0.47058823529411764,0.47058823529411764,0.3076923076923077
+1772,90,ig,selected_token_indices,selected_token_indices,True,46,8,5,49,1.0,0.10869565217391304,0.625,0.18518518518518517,0.10204081632653061
+1778,120,ig,selected_token_indices,selected_token_indices,True,77,13,8,82,1.0,0.1038961038961039,0.6153846153846154,0.1777777777777778,0.0975609756097561
+1785,163,ig,selected_token_indices,selected_token_indices,True,10,12,4,18,1.0,0.4,0.3333333333333333,0.3636363636363636,0.2222222222222222
+1789,174,ig,selected_token_indices,selected_token_indices,True,25,31,11,45,1.0,0.44,0.3548387096774194,0.3928571428571428,0.24444444444444444
+1791,188,ig,selected_token_indices,selected_token_indices,True,21,32,11,42,1.0,0.5238095238095238,0.34375,0.4150943396226415,0.2619047619047619
+1792,192,ig,selected_token_indices,selected_token_indices,True,23,1,1,23,1.0,0.043478260869565216,1.0,0.08333333333333333,0.043478260869565216
+1806,257,ig,selected_token_indices,selected_token_indices,True,56,7,6,57,1.0,0.10714285714285714,0.8571428571428571,0.19047619047619047,0.10526315789473684
+1808,266,ig,selected_token_indices,selected_token_indices,True,43,4,0,47,0.0,0.0,0.0,0.0,0.0
+1811,280,ig,selected_token_indices,selected_token_indices,True,55,13,3,65,1.0,0.05454545454545454,0.23076923076923078,0.08823529411764705,0.046153846153846156
+1812,289,ig,selected_token_indices,selected_token_indices,True,55,24,12,67,1.0,0.21818181818181817,0.5,0.3037974683544304,0.1791044776119403
+1813,291,ig,selected_token_indices,selected_token_indices,True,27,8,5,30,1.0,0.18518518518518517,0.625,0.2857142857142857,0.16666666666666666
+1818,303,ig,selected_token_indices,selected_token_indices,True,32,5,0,37,0.0,0.0,0.0,0.0,0.0
+1819,306,ig,selected_token_indices,selected_token_indices,True,32,8,3,37,1.0,0.09375,0.375,0.15,0.08108108108108109
+1820,321,ig,selected_token_indices,selected_token_indices,True,16,39,12,43,1.0,0.75,0.3076923076923077,0.4363636363636364,0.27906976744186046
+1821,330,ig,selected_token_indices,selected_token_indices,True,49,28,11,66,1.0,0.22448979591836735,0.39285714285714285,0.2857142857142857,0.16666666666666666
+1822,333,ig,selected_token_indices,selected_token_indices,True,30,15,5,40,1.0,0.16666666666666666,0.3333333333333333,0.2222222222222222,0.125
+1827,367,ig,selected_token_indices,selected_token_indices,True,7,3,1,9,1.0,0.14285714285714285,0.3333333333333333,0.2,0.1111111111111111
+1837,416,ig,selected_token_indices,selected_token_indices,True,29,22,12,39,1.0,0.41379310344827586,0.5454545454545454,0.47058823529411764,0.3076923076923077
+1838,417,ig,selected_token_indices,selected_token_indices,True,63,25,8,80,1.0,0.12698412698412698,0.32,0.18181818181818182,0.1
+1847,457,ig,selected_token_indices,selected_token_indices,True,23,17,3,37,1.0,0.13043478260869565,0.17647058823529413,0.15,0.08108108108108109
+1851,475,ig,selected_token_indices,selected_token_indices,True,35,11,3,43,1.0,0.08571428571428572,0.2727272727272727,0.13043478260869562,0.06976744186046512
+1852,479,ig,selected_token_indices,selected_token_indices,True,25,17,9,33,1.0,0.36,0.5294117647058824,0.42857142857142855,0.2727272727272727
+1855,489,ig,selected_token_indices,selected_token_indices,True,29,25,13,41,1.0,0.4482758620689655,0.52,0.48148148148148145,0.3170731707317073
+1857,500,ig,selected_token_indices,selected_token_indices,True,9,8,3,14,1.0,0.3333333333333333,0.375,0.35294117647058826,0.21428571428571427
+1858,505,ig,selected_token_indices,selected_token_indices,True,52,16,10,58,1.0,0.19230769230769232,0.625,0.29411764705882354,0.1724137931034483
+1863,525,ig,selected_token_indices,selected_token_indices,True,20,12,6,26,1.0,0.3,0.5,0.37499999999999994,0.23076923076923078
+1878,593,ig,selected_token_indices,selected_token_indices,True,88,32,14,106,1.0,0.1590909090909091,0.4375,0.23333333333333334,0.1320754716981132
+1894,691,ig,selected_token_indices,selected_token_indices,True,47,11,2,56,1.0,0.0425531914893617,0.18181818181818182,0.06896551724137931,0.03571428571428571
+1895,694,ig,selected_token_indices,selected_token_indices,True,22,10,6,26,1.0,0.2727272727272727,0.6,0.37499999999999994,0.23076923076923078
+1901,709,ig,selected_token_indices,selected_token_indices,True,50,15,6,59,1.0,0.12,0.4,0.18461538461538463,0.1016949152542373
+1912,746,ig,selected_token_indices,selected_token_indices,True,38,9,3,44,1.0,0.07894736842105263,0.3333333333333333,0.12765957446808512,0.06818181818181818
+1913,762,ig,selected_token_indices,selected_token_indices,True,32,6,4,34,1.0,0.125,0.6666666666666666,0.21052631578947367,0.11764705882352941
+1915,773,ig,selected_token_indices,selected_token_indices,True,46,57,24,79,1.0,0.5217391304347826,0.42105263157894735,0.46601941747572817,0.3037974683544304
+1916,774,ig,selected_token_indices,selected_token_indices,True,67,24,6,85,1.0,0.08955223880597014,0.25,0.13186813186813187,0.07058823529411765
+1918,785,ig,selected_token_indices,selected_token_indices,True,14,8,2,20,1.0,0.14285714285714285,0.25,0.18181818181818182,0.1
+1919,788,ig,selected_token_indices,selected_token_indices,True,31,2,2,31,1.0,0.06451612903225806,1.0,0.12121212121212122,0.06451612903225806
+1921,791,ig,selected_token_indices,selected_token_indices,True,16,13,5,24,1.0,0.3125,0.38461538461538464,0.3448275862068966,0.20833333333333334
+1932,881,ig,selected_token_indices,selected_token_indices,True,49,11,4,56,1.0,0.08163265306122448,0.36363636363636365,0.13333333333333333,0.07142857142857142
+1933,883,ig,selected_token_indices,selected_token_indices,True,74,10,6,78,1.0,0.08108108108108109,0.6,0.14285714285714288,0.07692307692307693
+1938,891,ig,selected_token_indices,selected_token_indices,True,28,31,9,50,1.0,0.32142857142857145,0.2903225806451613,0.3050847457627119,0.18
+1944,938,ig,selected_token_indices,selected_token_indices,True,39,9,1,47,1.0,0.02564102564102564,0.1111111111111111,0.041666666666666664,0.02127659574468085
+1949,954,ig,selected_token_indices,selected_token_indices,True,32,29,10,51,1.0,0.3125,0.3448275862068966,0.3278688524590164,0.19607843137254902
+1959,1005,ig,selected_token_indices,selected_token_indices,True,17,6,3,20,1.0,0.17647058823529413,0.5,0.2608695652173913,0.15
+1963,1018,ig,selected_token_indices,selected_token_indices,True,33,19,9,43,1.0,0.2727272727272727,0.47368421052631576,0.34615384615384615,0.20930232558139536
+1966,1025,ig,selected_token_indices,selected_token_indices,True,82,25,13,94,1.0,0.15853658536585366,0.52,0.24299065420560748,0.13829787234042554
+1969,1029,ig,selected_token_indices,selected_token_indices,True,55,12,2,65,1.0,0.03636363636363636,0.16666666666666666,0.05970149253731343,0.03076923076923077
+1971,1038,ig,selected_token_indices,selected_token_indices,True,72,15,9,78,1.0,0.125,0.6,0.20689655172413793,0.11538461538461539
+1976,1077,ig,selected_token_indices,selected_token_indices,True,43,13,3,53,1.0,0.06976744186046512,0.23076923076923078,0.10714285714285714,0.05660377358490566
+1984,1114,ig,selected_token_indices,selected_token_indices,True,35,26,9,52,1.0,0.2571428571428571,0.34615384615384615,0.29508196721311475,0.17307692307692307
+1985,1117,ig,selected_token_indices,selected_token_indices,True,19,18,6,31,1.0,0.3157894736842105,0.3333333333333333,0.3243243243243243,0.1935483870967742
+1988,1142,ig,selected_token_indices,selected_token_indices,True,39,13,7,45,1.0,0.1794871794871795,0.5384615384615384,0.2692307692307692,0.15555555555555556
+1995,1155,ig,selected_token_indices,selected_token_indices,True,32,88,32,88,1.0,1.0,0.36363636363636365,0.5333333333333333,0.36363636363636365
+1998,1183,ig,selected_token_indices,selected_token_indices,True,32,14,5,41,1.0,0.15625,0.35714285714285715,0.21739130434782608,0.12195121951219512
+2001,1206,ig,selected_token_indices,selected_token_indices,True,94,11,5,100,1.0,0.05319148936170213,0.45454545454545453,0.09523809523809525,0.05
+2004,1214,ig,selected_token_indices,selected_token_indices,True,56,37,21,72,1.0,0.375,0.5675675675675675,0.45161290322580644,0.2916666666666667
+2007,1241,ig,selected_token_indices,selected_token_indices,True,63,74,31,106,1.0,0.49206349206349204,0.4189189189189189,0.4525547445255474,0.29245283018867924
+2014,1262,ig,selected_token_indices,selected_token_indices,True,43,29,10,62,1.0,0.23255813953488372,0.3448275862068966,0.2777777777777778,0.16129032258064516
+2016,1270,ig,selected_token_indices,selected_token_indices,True,8,14,7,15,1.0,0.875,0.5,0.6363636363636364,0.4666666666666667
+2017,1271,ig,selected_token_indices,selected_token_indices,True,8,5,4,9,1.0,0.5,0.8,0.6153846153846154,0.4444444444444444
+2018,1272,ig,selected_token_indices,selected_token_indices,True,38,26,14,50,1.0,0.3684210526315789,0.5384615384615384,0.4375,0.28
+2020,1285,ig,selected_token_indices,selected_token_indices,True,16,2,0,18,0.0,0.0,0.0,0.0,0.0
+2024,1294,ig,selected_token_indices,selected_token_indices,True,8,9,4,13,1.0,0.5,0.4444444444444444,0.47058823529411764,0.3076923076923077
+2025,1305,ig,selected_token_indices,selected_token_indices,True,10,5,0,15,0.0,0.0,0.0,0.0,0.0
+2027,1314,ig,selected_token_indices,selected_token_indices,True,25,17,8,34,1.0,0.32,0.47058823529411764,0.38095238095238104,0.23529411764705882
+2034,1349,ig,selected_token_indices,selected_token_indices,True,38,6,5,39,1.0,0.13157894736842105,0.8333333333333334,0.22727272727272727,0.1282051282051282
+2037,1361,ig,selected_token_indices,selected_token_indices,True,68,3,1,70,1.0,0.014705882352941176,0.3333333333333333,0.028169014084507043,0.014285714285714285
+2047,1462,ig,selected_token_indices,selected_token_indices,True,16,27,9,34,1.0,0.5625,0.3333333333333333,0.4186046511627907,0.2647058823529412
+2049,1467,ig,selected_token_indices,selected_token_indices,True,15,5,2,18,1.0,0.13333333333333333,0.4,0.2,0.1111111111111111
+2058,1503,ig,selected_token_indices,selected_token_indices,True,46,6,3,49,1.0,0.06521739130434782,0.5,0.11538461538461539,0.061224489795918366
+2060,1513,ig,selected_token_indices,selected_token_indices,True,53,59,17,95,1.0,0.32075471698113206,0.288135593220339,0.30357142857142855,0.17894736842105263
+2069,1567,ig,selected_token_indices,selected_token_indices,True,10,3,0,13,0.0,0.0,0.0,0.0,0.0
+2074,1592,ig,selected_token_indices,selected_token_indices,True,38,32,10,60,1.0,0.2631578947368421,0.3125,0.2857142857142857,0.16666666666666666
+2076,1610,ig,selected_token_indices,selected_token_indices,True,19,19,8,30,1.0,0.42105263157894735,0.42105263157894735,0.42105263157894735,0.26666666666666666
+2077,1611,ig,selected_token_indices,selected_token_indices,True,29,38,19,48,1.0,0.6551724137931034,0.5,0.5671641791044776,0.3958333333333333
+2079,1615,ig,selected_token_indices,selected_token_indices,True,34,17,12,39,1.0,0.35294117647058826,0.7058823529411765,0.4705882352941177,0.3076923076923077
+2087,1655,ig,selected_token_indices,selected_token_indices,True,31,8,4,35,1.0,0.12903225806451613,0.5,0.20512820512820512,0.11428571428571428
+2088,1656,ig,selected_token_indices,selected_token_indices,True,31,10,3,38,1.0,0.0967741935483871,0.3,0.14634146341463414,0.07894736842105263
+2090,1667,ig,selected_token_indices,selected_token_indices,True,44,26,11,59,1.0,0.25,0.4230769230769231,0.3142857142857143,0.1864406779661017
+2098,1716,ig,selected_token_indices,selected_token_indices,True,55,11,8,58,1.0,0.14545454545454545,0.7272727272727273,0.2424242424242424,0.13793103448275862
+2107,1741,ig,selected_token_indices,selected_token_indices,True,13,31,2,42,1.0,0.15384615384615385,0.06451612903225806,0.09090909090909091,0.047619047619047616
+2112,1775,ig,selected_token_indices,selected_token_indices,True,10,2,1,11,1.0,0.1,0.5,0.16666666666666669,0.09090909090909091
+2118,1821,ig,selected_token_indices,selected_token_indices,True,40,9,6,43,1.0,0.15,0.6666666666666666,0.24489795918367346,0.13953488372093023
+2133,1902,ig,selected_token_indices,selected_token_indices,True,7,19,6,20,1.0,0.8571428571428571,0.3157894736842105,0.46153846153846156,0.3
+2140,1929,ig,selected_token_indices,selected_token_indices,True,30,6,2,34,1.0,0.06666666666666667,0.3333333333333333,0.1111111111111111,0.058823529411764705
+2150,1977,ig,selected_token_indices,selected_token_indices,True,46,19,4,61,1.0,0.08695652173913043,0.21052631578947367,0.12307692307692308,0.06557377049180328
+2153,1980,ig,selected_token_indices,selected_token_indices,True,68,8,7,69,1.0,0.10294117647058823,0.875,0.1842105263157895,0.10144927536231885
+2154,1988,ig,selected_token_indices,selected_token_indices,True,44,14,4,54,1.0,0.09090909090909091,0.2857142857142857,0.13793103448275862,0.07407407407407407
+2162,2023,ig,selected_token_indices,selected_token_indices,True,29,11,5,35,1.0,0.1724137931034483,0.45454545454545453,0.25000000000000006,0.14285714285714285
+2164,2040,ig,selected_token_indices,selected_token_indices,True,10,5,2,13,1.0,0.2,0.4,0.26666666666666666,0.15384615384615385
+2168,2062,ig,selected_token_indices,selected_token_indices,True,25,10,3,32,1.0,0.12,0.3,0.17142857142857143,0.09375
+2171,2087,ig,selected_token_indices,selected_token_indices,True,10,21,9,22,1.0,0.9,0.42857142857142855,0.5806451612903225,0.4090909090909091
+2172,2088,ig,selected_token_indices,selected_token_indices,True,11,10,6,15,1.0,0.5454545454545454,0.6,0.5714285714285713,0.4
+2176,2097,ig,selected_token_indices,selected_token_indices,True,7,17,6,18,1.0,0.8571428571428571,0.35294117647058826,0.5,0.3333333333333333
+2181,2128,ig,selected_token_indices,selected_token_indices,True,45,16,6,55,1.0,0.13333333333333333,0.375,0.19672131147540986,0.10909090909090909
+1754,8,shap,selected_token_indices,selected_token_indices,True,14,5,3,16,1.0,0.21428571428571427,0.6,0.3157894736842105,0.1875
+1756,12,shap,selected_token_indices,selected_token_indices,True,7,16,7,16,1.0,1.0,0.4375,0.6086956521739131,0.4375
+1759,22,shap,selected_token_indices,selected_token_indices,True,24,9,5,28,1.0,0.20833333333333334,0.5555555555555556,0.30303030303030304,0.17857142857142858
+1764,54,shap,selected_token_indices,selected_token_indices,True,7,13,6,14,1.0,0.8571428571428571,0.46153846153846156,0.6,0.42857142857142855
+1768,66,shap,selected_token_indices,selected_token_indices,True,19,4,1,22,1.0,0.05263157894736842,0.25,0.08695652173913043,0.045454545454545456
+1771,81,shap,selected_token_indices,selected_token_indices,True,40,34,22,52,1.0,0.55,0.6470588235294118,0.5945945945945946,0.4230769230769231
+1772,90,shap,selected_token_indices,selected_token_indices,True,49,8,3,54,1.0,0.061224489795918366,0.375,0.10526315789473682,0.05555555555555555
+1778,120,shap,selected_token_indices,selected_token_indices,True,94,13,13,94,1.0,0.13829787234042554,1.0,0.24299065420560748,0.13829787234042554
+1785,163,shap,selected_token_indices,selected_token_indices,True,10,12,5,17,1.0,0.5,0.4166666666666667,0.45454545454545453,0.29411764705882354
+1789,174,shap,selected_token_indices,selected_token_indices,True,31,31,19,43,1.0,0.6129032258064516,0.6129032258064516,0.6129032258064516,0.4418604651162791
+1791,188,shap,selected_token_indices,selected_token_indices,True,26,32,16,42,1.0,0.6153846153846154,0.5,0.5517241379310345,0.38095238095238093
+1792,192,shap,selected_token_indices,selected_token_indices,True,28,1,1,28,1.0,0.03571428571428571,1.0,0.0689655172413793,0.03571428571428571
+1806,257,shap,selected_token_indices,selected_token_indices,True,75,7,6,76,1.0,0.08,0.8571428571428571,0.14634146341463417,0.07894736842105263
+1808,266,shap,selected_token_indices,selected_token_indices,True,44,4,2,46,1.0,0.045454545454545456,0.5,0.08333333333333334,0.043478260869565216
+1811,280,shap,selected_token_indices,selected_token_indices,True,57,13,5,65,1.0,0.08771929824561403,0.38461538461538464,0.14285714285714285,0.07692307692307693
+1812,289,shap,selected_token_indices,selected_token_indices,True,68,24,17,75,1.0,0.25,0.7083333333333334,0.3695652173913044,0.22666666666666666
+1813,291,shap,selected_token_indices,selected_token_indices,True,31,8,8,31,1.0,0.25806451612903225,1.0,0.41025641025641024,0.25806451612903225
+1818,303,shap,selected_token_indices,selected_token_indices,True,32,5,5,32,1.0,0.15625,1.0,0.2702702702702703,0.15625
+1819,306,shap,selected_token_indices,selected_token_indices,True,34,8,3,39,1.0,0.08823529411764706,0.375,0.14285714285714285,0.07692307692307693
+1820,321,shap,selected_token_indices,selected_token_indices,True,22,39,17,44,1.0,0.7727272727272727,0.4358974358974359,0.5573770491803278,0.38636363636363635
+1821,330,shap,selected_token_indices,selected_token_indices,True,68,28,20,76,1.0,0.29411764705882354,0.7142857142857143,0.4166666666666667,0.2631578947368421
+1822,333,shap,selected_token_indices,selected_token_indices,True,40,15,10,45,1.0,0.25,0.6666666666666666,0.36363636363636365,0.2222222222222222
+1827,367,shap,selected_token_indices,selected_token_indices,True,5,3,2,6,1.0,0.4,0.6666666666666666,0.5,0.3333333333333333
+1837,416,shap,selected_token_indices,selected_token_indices,True,18,22,8,32,1.0,0.4444444444444444,0.36363636363636365,0.39999999999999997,0.25
+1838,417,shap,selected_token_indices,selected_token_indices,True,67,25,11,81,1.0,0.16417910447761194,0.44,0.2391304347826087,0.13580246913580246
+1847,457,shap,selected_token_indices,selected_token_indices,True,19,17,5,31,1.0,0.2631578947368421,0.29411764705882354,0.27777777777777773,0.16129032258064516
+1851,475,shap,selected_token_indices,selected_token_indices,True,19,11,6,24,1.0,0.3157894736842105,0.5454545454545454,0.39999999999999997,0.25
+1852,479,shap,selected_token_indices,selected_token_indices,True,28,17,8,37,1.0,0.2857142857142857,0.47058823529411764,0.35555555555555557,0.21621621621621623
+1855,489,shap,selected_token_indices,selected_token_indices,True,20,25,13,32,1.0,0.65,0.52,0.5777777777777778,0.40625
+1857,500,shap,selected_token_indices,selected_token_indices,True,8,8,4,12,1.0,0.5,0.5,0.5,0.3333333333333333
+1858,505,shap,selected_token_indices,selected_token_indices,True,56,16,10,62,1.0,0.17857142857142858,0.625,0.2777777777777778,0.16129032258064516
+1863,525,shap,selected_token_indices,selected_token_indices,True,23,12,9,26,1.0,0.391304347826087,0.75,0.5142857142857143,0.34615384615384615
+1878,593,shap,selected_token_indices,selected_token_indices,True,88,32,9,111,1.0,0.10227272727272728,0.28125,0.15,0.08108108108108109
+1894,691,shap,selected_token_indices,selected_token_indices,True,62,11,10,63,1.0,0.16129032258064516,0.9090909090909091,0.273972602739726,0.15873015873015872
+1895,694,shap,selected_token_indices,selected_token_indices,True,22,10,3,29,1.0,0.13636363636363635,0.3,0.18749999999999997,0.10344827586206896
+1901,709,shap,selected_token_indices,selected_token_indices,True,64,15,9,70,1.0,0.140625,0.6,0.22784810126582278,0.12857142857142856
+1912,746,shap,selected_token_indices,selected_token_indices,True,54,9,5,58,1.0,0.09259259259259259,0.5555555555555556,0.15873015873015875,0.08620689655172414
+1913,762,shap,selected_token_indices,selected_token_indices,True,30,6,5,31,1.0,0.16666666666666666,0.8333333333333334,0.2777777777777778,0.16129032258064516
+1915,773,shap,selected_token_indices,selected_token_indices,True,43,57,34,66,1.0,0.7906976744186046,0.5964912280701754,0.6799999999999999,0.5151515151515151
+1916,774,shap,selected_token_indices,selected_token_indices,True,62,24,5,81,1.0,0.08064516129032258,0.20833333333333334,0.11627906976744184,0.06172839506172839
+1918,785,shap,selected_token_indices,selected_token_indices,True,13,8,2,19,1.0,0.15384615384615385,0.25,0.1904761904761905,0.10526315789473684
+1919,788,shap,selected_token_indices,selected_token_indices,True,29,2,1,30,1.0,0.034482758620689655,0.5,0.06451612903225806,0.03333333333333333
+1921,791,shap,selected_token_indices,selected_token_indices,True,19,13,8,24,1.0,0.42105263157894735,0.6153846153846154,0.5,0.3333333333333333
+1932,881,shap,selected_token_indices,selected_token_indices,True,50,11,5,56,1.0,0.1,0.45454545454545453,0.16393442622950818,0.08928571428571429
+1933,883,shap,selected_token_indices,selected_token_indices,True,80,10,7,83,1.0,0.0875,0.7,0.15555555555555553,0.08433734939759036
+1938,891,shap,selected_token_indices,selected_token_indices,True,43,31,15,59,1.0,0.3488372093023256,0.4838709677419355,0.4054054054054055,0.2542372881355932
+1944,938,shap,selected_token_indices,selected_token_indices,True,48,9,6,51,1.0,0.125,0.6666666666666666,0.21052631578947367,0.11764705882352941
+1949,954,shap,selected_token_indices,selected_token_indices,True,36,29,10,55,1.0,0.2777777777777778,0.3448275862068966,0.3076923076923077,0.18181818181818182
+1959,1005,shap,selected_token_indices,selected_token_indices,True,21,6,5,22,1.0,0.23809523809523808,0.8333333333333334,0.37037037037037035,0.22727272727272727
+1963,1018,shap,selected_token_indices,selected_token_indices,True,33,19,13,39,1.0,0.3939393939393939,0.6842105263157895,0.5,0.3333333333333333
+1966,1025,shap,selected_token_indices,selected_token_indices,True,75,25,22,78,1.0,0.29333333333333333,0.88,0.44,0.28205128205128205
+1969,1029,shap,selected_token_indices,selected_token_indices,True,49,12,11,50,1.0,0.22448979591836735,0.9166666666666666,0.36065573770491804,0.22
+1971,1038,shap,selected_token_indices,selected_token_indices,True,70,15,11,74,1.0,0.15714285714285714,0.7333333333333333,0.2588235294117647,0.14864864864864866
+1976,1077,shap,selected_token_indices,selected_token_indices,True,54,13,5,62,1.0,0.09259259259259259,0.38461538461538464,0.14925373134328357,0.08064516129032258
+1984,1114,shap,selected_token_indices,selected_token_indices,True,46,26,18,54,1.0,0.391304347826087,0.6923076923076923,0.5,0.3333333333333333
+1985,1117,shap,selected_token_indices,selected_token_indices,True,18,18,6,30,1.0,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.2
+1988,1142,shap,selected_token_indices,selected_token_indices,True,43,13,4,52,1.0,0.09302325581395349,0.3076923076923077,0.14285714285714285,0.07692307692307693
+1995,1155,shap,selected_token_indices,selected_token_indices,True,39,88,39,88,1.0,1.0,0.4431818181818182,0.6141732283464567,0.4431818181818182
+1998,1183,shap,selected_token_indices,selected_token_indices,True,40,14,6,48,1.0,0.15,0.42857142857142855,0.2222222222222222,0.125
+2001,1206,shap,selected_token_indices,selected_token_indices,True,76,11,6,81,1.0,0.07894736842105263,0.5454545454545454,0.13793103448275862,0.07407407407407407
+2004,1214,shap,selected_token_indices,selected_token_indices,True,53,37,27,63,1.0,0.5094339622641509,0.7297297297297297,0.6,0.42857142857142855
+2007,1241,shap,selected_token_indices,selected_token_indices,True,77,74,56,95,1.0,0.7272727272727273,0.7567567567567568,0.7417218543046358,0.5894736842105263
+2014,1262,shap,selected_token_indices,selected_token_indices,True,64,29,11,82,1.0,0.171875,0.3793103448275862,0.23655913978494625,0.13414634146341464
+2016,1270,shap,selected_token_indices,selected_token_indices,True,7,14,6,15,1.0,0.8571428571428571,0.42857142857142855,0.5714285714285714,0.4
+2017,1271,shap,selected_token_indices,selected_token_indices,True,8,5,3,10,1.0,0.375,0.6,0.4615384615384615,0.3
+2018,1272,shap,selected_token_indices,selected_token_indices,True,41,26,15,52,1.0,0.36585365853658536,0.5769230769230769,0.44776119402985076,0.28846153846153844
+2020,1285,shap,selected_token_indices,selected_token_indices,True,21,2,0,23,0.0,0.0,0.0,0.0,0.0
+2024,1294,shap,selected_token_indices,selected_token_indices,True,8,9,3,14,1.0,0.375,0.3333333333333333,0.35294117647058826,0.21428571428571427
+2025,1305,shap,selected_token_indices,selected_token_indices,True,9,5,3,11,1.0,0.3333333333333333,0.6,0.42857142857142855,0.2727272727272727
+2027,1314,shap,selected_token_indices,selected_token_indices,True,32,17,11,38,1.0,0.34375,0.6470588235294118,0.4489795918367347,0.2894736842105263
+2034,1349,shap,selected_token_indices,selected_token_indices,True,38,6,6,38,1.0,0.15789473684210525,1.0,0.2727272727272727,0.15789473684210525
+2037,1361,shap,selected_token_indices,selected_token_indices,True,49,3,3,49,1.0,0.061224489795918366,1.0,0.11538461538461538,0.061224489795918366
+2047,1462,shap,selected_token_indices,selected_token_indices,True,19,27,7,39,1.0,0.3684210526315789,0.25925925925925924,0.30434782608695654,0.1794871794871795
+2049,1467,shap,selected_token_indices,selected_token_indices,True,16,5,2,19,1.0,0.125,0.4,0.19047619047619047,0.10526315789473684
+2058,1503,shap,selected_token_indices,selected_token_indices,True,45,6,6,45,1.0,0.13333333333333333,1.0,0.23529411764705882,0.13333333333333333
+2060,1513,shap,selected_token_indices,selected_token_indices,True,64,59,21,102,1.0,0.328125,0.3559322033898305,0.34146341463414637,0.20588235294117646
+2069,1567,shap,selected_token_indices,selected_token_indices,True,8,3,0,11,0.0,0.0,0.0,0.0,0.0
+2074,1592,shap,selected_token_indices,selected_token_indices,True,49,32,5,76,1.0,0.10204081632653061,0.15625,0.1234567901234568,0.06578947368421052
+2076,1610,shap,selected_token_indices,selected_token_indices,True,17,19,8,28,1.0,0.47058823529411764,0.42105263157894735,0.4444444444444444,0.2857142857142857
+2077,1611,shap,selected_token_indices,selected_token_indices,True,28,38,12,54,1.0,0.42857142857142855,0.3157894736842105,0.36363636363636365,0.2222222222222222
+2079,1615,shap,selected_token_indices,selected_token_indices,True,50,17,8,59,1.0,0.16,0.47058823529411764,0.23880597014925375,0.13559322033898305
+2087,1655,shap,selected_token_indices,selected_token_indices,True,34,8,6,36,1.0,0.17647058823529413,0.75,0.2857142857142857,0.16666666666666666
+2088,1656,shap,selected_token_indices,selected_token_indices,True,39,10,9,40,1.0,0.23076923076923078,0.9,0.3673469387755102,0.225
+2090,1667,shap,selected_token_indices,selected_token_indices,True,40,26,9,57,1.0,0.225,0.34615384615384615,0.27272727272727276,0.15789473684210525
+2098,1716,shap,selected_token_indices,selected_token_indices,True,44,11,10,45,1.0,0.22727272727272727,0.9090909090909091,0.36363636363636365,0.2222222222222222
+2107,1741,shap,selected_token_indices,selected_token_indices,True,23,31,4,50,1.0,0.17391304347826086,0.12903225806451613,0.14814814814814814,0.08
+2112,1775,shap,selected_token_indices,selected_token_indices,True,9,2,1,10,1.0,0.1111111111111111,0.5,0.1818181818181818,0.1
+2118,1821,shap,selected_token_indices,selected_token_indices,True,46,9,6,49,1.0,0.13043478260869565,0.6666666666666666,0.21818181818181817,0.12244897959183673
+2133,1902,shap,selected_token_indices,selected_token_indices,True,8,19,8,19,1.0,1.0,0.42105263157894735,0.5925925925925926,0.42105263157894735
+2140,1929,shap,selected_token_indices,selected_token_indices,True,29,6,6,29,1.0,0.20689655172413793,1.0,0.34285714285714286,0.20689655172413793
+2150,1977,shap,selected_token_indices,selected_token_indices,True,44,19,15,48,1.0,0.3409090909090909,0.7894736842105263,0.4761904761904762,0.3125
+2153,1980,shap,selected_token_indices,selected_token_indices,True,74,8,6,76,1.0,0.08108108108108109,0.75,0.14634146341463414,0.07894736842105263
+2154,1988,shap,selected_token_indices,selected_token_indices,True,37,14,9,42,1.0,0.24324324324324326,0.6428571428571429,0.35294117647058826,0.21428571428571427
+2162,2023,shap,selected_token_indices,selected_token_indices,True,33,11,4,40,1.0,0.12121212121212122,0.36363636363636365,0.18181818181818182,0.1
+2164,2040,shap,selected_token_indices,selected_token_indices,True,8,5,2,11,1.0,0.25,0.4,0.3076923076923077,0.18181818181818182
+2168,2062,shap,selected_token_indices,selected_token_indices,True,36,10,6,40,1.0,0.16666666666666666,0.6,0.2608695652173913,0.15
+2171,2087,shap,selected_token_indices,selected_token_indices,True,11,21,10,22,1.0,0.9090909090909091,0.47619047619047616,0.6249999999999999,0.45454545454545453
+2172,2088,shap,selected_token_indices,selected_token_indices,True,9,10,6,13,1.0,0.6666666666666666,0.6,0.631578947368421,0.46153846153846156
+2176,2097,shap,selected_token_indices,selected_token_indices,True,8,17,7,18,1.0,0.875,0.4117647058823529,0.56,0.3888888888888889
+2181,2128,shap,selected_token_indices,selected_token_indices,True,45,16,7,54,1.0,0.15555555555555556,0.4375,0.2295081967213115,0.12962962962962962
+1754,8,mil,selected_token_indices_json,selected_token_indices,True,23,5,4,24,1.0,0.17391304347826086,0.8,0.2857142857142857,0.16666666666666666
+1756,12,mil,selected_token_indices_json,selected_token_indices,True,16,16,16,16,1.0,1.0,1.0,1.0,1.0
+1759,22,mil,selected_token_indices_json,selected_token_indices,True,36,9,0,45,0.0,0.0,0.0,0.0,0.0
+1764,54,mil,selected_token_indices_json,selected_token_indices,True,13,13,13,13,1.0,1.0,1.0,1.0,1.0
+1768,66,mil,selected_token_indices_json,selected_token_indices,True,32,4,4,32,1.0,0.125,1.0,0.2222222222222222,0.125
+1771,81,mil,selected_token_indices_json,selected_token_indices,True,42,34,12,64,1.0,0.2857142857142857,0.35294117647058826,0.31578947368421056,0.1875
+1772,90,mil,selected_token_indices_json,selected_token_indices,True,39,8,0,47,0.0,0.0,0.0,0.0,0.0
+1778,120,mil,selected_token_indices_json,selected_token_indices,True,51,13,7,57,1.0,0.13725490196078433,0.5384615384615384,0.21875,0.12280701754385964
+1785,163,mil,selected_token_indices_json,selected_token_indices,True,20,12,12,20,1.0,0.6,1.0,0.7499999999999999,0.6
+1789,174,mil,selected_token_indices_json,selected_token_indices,True,57,31,30,58,1.0,0.5263157894736842,0.967741935483871,0.6818181818181819,0.5172413793103449
+1791,188,mil,selected_token_indices_json,selected_token_indices,True,34,32,12,54,1.0,0.35294117647058826,0.375,0.3636363636363636,0.2222222222222222
+1792,192,mil,selected_token_indices_json,selected_token_indices,True,49,1,1,49,1.0,0.02040816326530612,1.0,0.039999999999999994,0.02040816326530612
+1806,257,mil,selected_token_indices_json,selected_token_indices,True,37,7,0,44,0.0,0.0,0.0,0.0,0.0
+1808,266,mil,selected_token_indices_json,selected_token_indices,True,33,4,3,34,1.0,0.09090909090909091,0.75,0.16216216216216214,0.08823529411764706
+1811,280,mil,selected_token_indices_json,selected_token_indices,True,25,13,0,38,0.0,0.0,0.0,0.0,0.0
+1812,289,mil,selected_token_indices_json,selected_token_indices,True,42,24,15,51,1.0,0.35714285714285715,0.625,0.45454545454545453,0.29411764705882354
+1813,291,mil,selected_token_indices_json,selected_token_indices,True,36,8,8,36,1.0,0.2222222222222222,1.0,0.3636363636363636,0.2222222222222222
+1818,303,mil,selected_token_indices_json,selected_token_indices,True,42,5,5,42,1.0,0.11904761904761904,1.0,0.21276595744680848,0.11904761904761904
+1819,306,mil,selected_token_indices_json,selected_token_indices,True,34,8,4,38,1.0,0.11764705882352941,0.5,0.19047619047619047,0.10526315789473684
+1820,321,mil,selected_token_indices_json,selected_token_indices,True,35,39,34,40,1.0,0.9714285714285714,0.8717948717948718,0.9189189189189189,0.85
+1821,330,mil,selected_token_indices_json,selected_token_indices,True,43,28,22,49,1.0,0.5116279069767442,0.7857142857142857,0.619718309859155,0.4489795918367347
+1822,333,mil,selected_token_indices_json,selected_token_indices,True,35,15,7,43,1.0,0.2,0.4666666666666667,0.27999999999999997,0.16279069767441862
+1827,367,mil,selected_token_indices_json,selected_token_indices,True,13,3,3,13,1.0,0.23076923076923078,1.0,0.375,0.23076923076923078
+1837,416,mil,selected_token_indices_json,selected_token_indices,True,42,22,22,42,1.0,0.5238095238095238,1.0,0.6875000000000001,0.5238095238095238
+1838,417,mil,selected_token_indices_json,selected_token_indices,True,57,25,15,67,1.0,0.2631578947368421,0.6,0.36585365853658536,0.22388059701492538
+1847,457,mil,selected_token_indices_json,selected_token_indices,True,43,17,12,48,1.0,0.27906976744186046,0.7058823529411765,0.4,0.25
+1851,475,mil,selected_token_indices_json,selected_token_indices,True,30,11,2,39,1.0,0.06666666666666667,0.18181818181818182,0.0975609756097561,0.05128205128205128
+1852,479,mil,selected_token_indices_json,selected_token_indices,True,24,17,10,31,1.0,0.4166666666666667,0.5882352941176471,0.48780487804878053,0.3225806451612903
+1855,489,mil,selected_token_indices_json,selected_token_indices,True,33,25,8,50,1.0,0.24242424242424243,0.32,0.2758620689655172,0.16
+1857,500,mil,selected_token_indices_json,selected_token_indices,True,18,8,8,18,1.0,0.4444444444444444,1.0,0.6153846153846153,0.4444444444444444
+1858,505,mil,selected_token_indices_json,selected_token_indices,True,41,16,9,48,1.0,0.21951219512195122,0.5625,0.3157894736842105,0.1875
+1863,525,mil,selected_token_indices_json,selected_token_indices,True,41,12,12,41,1.0,0.2926829268292683,1.0,0.45283018867924524,0.2926829268292683
+1878,593,mil,selected_token_indices_json,selected_token_indices,True,30,32,8,54,1.0,0.26666666666666666,0.25,0.2580645161290323,0.14814814814814814
+1894,691,mil,selected_token_indices_json,selected_token_indices,True,43,11,5,49,1.0,0.11627906976744186,0.45454545454545453,0.18518518518518515,0.10204081632653061
+1895,694,mil,selected_token_indices_json,selected_token_indices,True,31,10,10,31,1.0,0.3225806451612903,1.0,0.4878048780487805,0.3225806451612903
+1901,709,mil,selected_token_indices_json,selected_token_indices,True,54,15,7,62,1.0,0.12962962962962962,0.4666666666666667,0.20289855072463767,0.11290322580645161
+1912,746,mil,selected_token_indices_json,selected_token_indices,True,53,9,7,55,1.0,0.1320754716981132,0.7777777777777778,0.22580645161290322,0.12727272727272726
+1913,762,mil,selected_token_indices_json,selected_token_indices,True,41,6,6,41,1.0,0.14634146341463414,1.0,0.2553191489361702,0.14634146341463414
+1915,773,mil,selected_token_indices_json,selected_token_indices,True,43,57,36,64,1.0,0.8372093023255814,0.631578947368421,0.72,0.5625
+1916,774,mil,selected_token_indices_json,selected_token_indices,True,43,24,3,64,1.0,0.06976744186046512,0.125,0.08955223880597014,0.046875
+1918,785,mil,selected_token_indices_json,selected_token_indices,True,24,8,8,24,1.0,0.3333333333333333,1.0,0.5,0.3333333333333333
+1919,788,mil,selected_token_indices_json,selected_token_indices,True,39,2,2,39,1.0,0.05128205128205128,1.0,0.09756097560975609,0.05128205128205128
+1921,791,mil,selected_token_indices_json,selected_token_indices,True,31,13,13,31,1.0,0.41935483870967744,1.0,0.5909090909090909,0.41935483870967744
+1932,881,mil,selected_token_indices_json,selected_token_indices,True,49,11,0,60,0.0,0.0,0.0,0.0,0.0
+1933,883,mil,selected_token_indices_json,selected_token_indices,True,51,10,6,55,1.0,0.11764705882352941,0.6,0.19672131147540983,0.10909090909090909
+1938,891,mil,selected_token_indices_json,selected_token_indices,True,40,31,26,45,1.0,0.65,0.8387096774193549,0.7323943661971831,0.5777777777777777
+1944,938,mil,selected_token_indices_json,selected_token_indices,True,43,9,5,47,1.0,0.11627906976744186,0.5555555555555556,0.19230769230769232,0.10638297872340426
+1949,954,mil,selected_token_indices_json,selected_token_indices,True,51,29,24,56,1.0,0.47058823529411764,0.8275862068965517,0.6,0.42857142857142855
+1959,1005,mil,selected_token_indices_json,selected_token_indices,True,40,6,6,40,1.0,0.15,1.0,0.2608695652173913,0.15
+1963,1018,mil,selected_token_indices_json,selected_token_indices,True,50,19,8,61,1.0,0.16,0.42105263157894735,0.2318840579710145,0.13114754098360656
+1966,1025,mil,selected_token_indices_json,selected_token_indices,True,43,25,16,52,1.0,0.37209302325581395,0.64,0.4705882352941177,0.3076923076923077
+1969,1029,mil,selected_token_indices_json,selected_token_indices,True,37,12,12,37,1.0,0.32432432432432434,1.0,0.489795918367347,0.32432432432432434
+1971,1038,mil,selected_token_indices_json,selected_token_indices,True,62,15,14,63,1.0,0.22580645161290322,0.9333333333333333,0.36363636363636365,0.2222222222222222
+1976,1077,mil,selected_token_indices_json,selected_token_indices,True,25,13,0,38,0.0,0.0,0.0,0.0,0.0
+1984,1114,mil,selected_token_indices_json,selected_token_indices,True,30,26,0,56,0.0,0.0,0.0,0.0,0.0
+1985,1117,mil,selected_token_indices_json,selected_token_indices,True,42,18,18,42,1.0,0.42857142857142855,1.0,0.6,0.42857142857142855
+1988,1142,mil,selected_token_indices_json,selected_token_indices,True,32,13,8,37,1.0,0.25,0.6153846153846154,0.35555555555555557,0.21621621621621623
+1995,1155,mil,selected_token_indices_json,selected_token_indices,True,35,88,35,88,1.0,1.0,0.3977272727272727,0.5691056910569106,0.3977272727272727
+1998,1183,mil,selected_token_indices_json,selected_token_indices,True,24,14,1,37,1.0,0.041666666666666664,0.07142857142857142,0.052631578947368425,0.02702702702702703
+2001,1206,mil,selected_token_indices_json,selected_token_indices,True,36,11,6,41,1.0,0.16666666666666666,0.5454545454545454,0.2553191489361702,0.14634146341463414
+2004,1214,mil,selected_token_indices_json,selected_token_indices,True,37,37,14,60,1.0,0.3783783783783784,0.3783783783783784,0.37837837837837834,0.23333333333333334
+2007,1241,mil,selected_token_indices_json,selected_token_indices,True,24,74,24,74,1.0,1.0,0.32432432432432434,0.489795918367347,0.32432432432432434
+2014,1262,mil,selected_token_indices_json,selected_token_indices,True,71,29,12,88,1.0,0.16901408450704225,0.41379310344827586,0.24000000000000002,0.13636363636363635
+2016,1270,mil,selected_token_indices_json,selected_token_indices,True,14,14,14,14,1.0,1.0,1.0,1.0,1.0
+2017,1271,mil,selected_token_indices_json,selected_token_indices,True,16,5,5,16,1.0,0.3125,1.0,0.47619047619047616,0.3125
+2018,1272,mil,selected_token_indices_json,selected_token_indices,True,37,26,2,61,1.0,0.05405405405405406,0.07692307692307693,0.06349206349206349,0.03278688524590164
+2020,1285,mil,selected_token_indices_json,selected_token_indices,True,32,2,2,32,1.0,0.0625,1.0,0.11764705882352941,0.0625
+2024,1294,mil,selected_token_indices_json,selected_token_indices,True,15,9,9,15,1.0,0.6,1.0,0.7499999999999999,0.6
+2025,1305,mil,selected_token_indices_json,selected_token_indices,True,17,5,5,17,1.0,0.29411764705882354,1.0,0.45454545454545453,0.29411764705882354
+2027,1314,mil,selected_token_indices_json,selected_token_indices,True,23,17,10,30,1.0,0.43478260869565216,0.5882352941176471,0.5,0.3333333333333333
+2034,1349,mil,selected_token_indices_json,selected_token_indices,True,51,6,6,51,1.0,0.11764705882352941,1.0,0.21052631578947367,0.11764705882352941
+2037,1361,mil,selected_token_indices_json,selected_token_indices,True,64,3,3,64,1.0,0.046875,1.0,0.08955223880597014,0.046875
+2047,1462,mil,selected_token_indices_json,selected_token_indices,True,24,27,16,35,1.0,0.6666666666666666,0.5925925925925926,0.627450980392157,0.45714285714285713
+2049,1467,mil,selected_token_indices_json,selected_token_indices,True,24,5,3,26,1.0,0.125,0.6,0.20689655172413793,0.11538461538461539
+2058,1503,mil,selected_token_indices_json,selected_token_indices,True,46,6,0,52,0.0,0.0,0.0,0.0,0.0
+2060,1513,mil,selected_token_indices_json,selected_token_indices,True,45,59,22,82,1.0,0.4888888888888889,0.3728813559322034,0.42307692307692313,0.2682926829268293
+2069,1567,mil,selected_token_indices_json,selected_token_indices,True,18,3,3,18,1.0,0.16666666666666666,1.0,0.2857142857142857,0.16666666666666666
+2074,1592,mil,selected_token_indices_json,selected_token_indices,True,42,32,9,65,1.0,0.21428571428571427,0.28125,0.2432432432432432,0.13846153846153847
+2076,1610,mil,selected_token_indices_json,selected_token_indices,True,26,19,19,26,1.0,0.7307692307692307,1.0,0.8444444444444443,0.7307692307692307
+2077,1611,mil,selected_token_indices_json,selected_token_indices,True,31,38,28,41,1.0,0.9032258064516129,0.7368421052631579,0.8115942028985507,0.6829268292682927
+2079,1615,mil,selected_token_indices_json,selected_token_indices,True,61,17,8,70,1.0,0.13114754098360656,0.47058823529411764,0.20512820512820512,0.11428571428571428
+2087,1655,mil,selected_token_indices_json,selected_token_indices,True,24,8,7,25,1.0,0.2916666666666667,0.875,0.43750000000000006,0.28
+2088,1656,mil,selected_token_indices_json,selected_token_indices,True,32,10,5,37,1.0,0.15625,0.5,0.23809523809523808,0.13513513513513514
+2090,1667,mil,selected_token_indices_json,selected_token_indices,True,25,26,20,31,1.0,0.8,0.7692307692307693,0.7843137254901961,0.6451612903225806
+2098,1716,mil,selected_token_indices_json,selected_token_indices,True,46,11,9,48,1.0,0.1956521739130435,0.8181818181818182,0.3157894736842105,0.1875
+2107,1741,mil,selected_token_indices_json,selected_token_indices,True,58,31,31,58,1.0,0.5344827586206896,1.0,0.6966292134831461,0.5344827586206896
+2112,1775,mil,selected_token_indices_json,selected_token_indices,True,18,2,2,18,1.0,0.1111111111111111,1.0,0.19999999999999998,0.1111111111111111
+2118,1821,mil,selected_token_indices_json,selected_token_indices,True,42,9,3,48,1.0,0.07142857142857142,0.3333333333333333,0.11764705882352941,0.0625
+2133,1902,mil,selected_token_indices_json,selected_token_indices,True,19,19,19,19,1.0,1.0,1.0,1.0,1.0
+2140,1929,mil,selected_token_indices_json,selected_token_indices,True,35,6,6,35,1.0,0.17142857142857143,1.0,0.2926829268292683,0.17142857142857143
+2150,1977,mil,selected_token_indices_json,selected_token_indices,True,42,19,15,46,1.0,0.35714285714285715,0.7894736842105263,0.4918032786885246,0.32608695652173914
+2153,1980,mil,selected_token_indices_json,selected_token_indices,True,41,8,8,41,1.0,0.1951219512195122,1.0,0.326530612244898,0.1951219512195122
+2154,1988,mil,selected_token_indices_json,selected_token_indices,True,58,14,5,67,1.0,0.08620689655172414,0.35714285714285715,0.1388888888888889,0.07462686567164178
+2162,2023,mil,selected_token_indices_json,selected_token_indices,True,49,11,10,50,1.0,0.20408163265306123,0.9090909090909091,0.33333333333333337,0.2
+2164,2040,mil,selected_token_indices_json,selected_token_indices,True,16,5,5,16,1.0,0.3125,1.0,0.47619047619047616,0.3125
+2168,2062,mil,selected_token_indices_json,selected_token_indices,True,29,10,0,39,0.0,0.0,0.0,0.0,0.0
+2171,2087,mil,selected_token_indices_json,selected_token_indices,True,21,21,21,21,1.0,1.0,1.0,1.0,1.0
+2172,2088,mil,selected_token_indices_json,selected_token_indices,True,18,10,10,18,1.0,0.5555555555555556,1.0,0.7142857142857143,0.5555555555555556
+2176,2097,mil,selected_token_indices_json,selected_token_indices,True,17,17,17,17,1.0,1.0,1.0,1.0,1.0
+2181,2128,mil,selected_token_indices_json,selected_token_indices,True,27,16,4,39,1.0,0.14814814814814814,0.25,0.18604651162790697,0.10256410256410256
