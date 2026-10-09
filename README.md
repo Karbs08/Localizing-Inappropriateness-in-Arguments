@@ -54,7 +54,10 @@ The original classifier is [timonziegenbein/appropriateness-classifier-binary](h
 - Its maximum input length is **512 model tokens**.
 - The issue is retained as metadata and is provided separately to MIL and the LLM annotator. It is not prepended to the fixed classifier's input.
 
-The inappropriate-class probability is denoted by $p_1(x)=P(y=1\mid x)$. The original classifier is used to obtain document predictions and to evaluate selected evidence by rerunning it on perturbed arguments. It is not retrained in these experiments. MIL learns a separate prediction function and is evaluated separately at bag level.
+The inappropriate-class probability is denoted by $p_1(x)=P(y=1\mid x)$. The original classifier is used to obtain document predictions and to evaluate selected evidence by rerunning it on perturbed arguments. It is not retrained in these experiments. MIL learns a separate prediction function and is evaluated separately at bag level. 
+The `model_info` from `huggingface_hub` is:
+- Model revision: f3ad61c86bf9e1140d44d74f6df5ed4733ecccde
+- Last modified: 2024-07-31 09:08:00+00:00
 
 ## Experimental protocol
 

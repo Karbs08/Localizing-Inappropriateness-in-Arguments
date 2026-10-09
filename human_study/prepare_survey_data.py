@@ -33,7 +33,7 @@ METHOD_FILES = {
     "random": RESULT_DIR / "random_baseline_results/random_best_config_test_per_argument.csv",
     "tfidf": RESULT_DIR / "tfidf_baseline_results/final_test_all_window2_topk8/tfidf_final_test_all_window2_topk8_argument_level.csv",
     "attention": RESULT_DIR / "attention_results/attention_results_final/attention_final_all_splits_rollout_q0.4_window0_argument_level.csv",
-    "ig": RESULT_DIR / "ig_results/ig_results_final/ig_final_all_splits_q0.4_window1_argument_level.csv",
+    "ig": RESULT_DIR / "ig_results/ig_results_final/ig_final_all_splits_q0.4_window3_argument_level.csv",
     "shap": RESULT_DIR / "shap_results/shap_results_final/shap_final_test_q0.5_window0_argument_level.csv",
     "mil": RESULT_DIR / "mil_results/mil_span_run_singles/mil_results_final/mil_final_all_splits_pool=topk_noisy_or__topk=3__spans=15__stride=4__freeze=True_argument_level.csv",
     "llm": RESULT_DIR / "llm_reference/llm_test_tp_spans_argument_level.csv",
