@@ -248,8 +248,7 @@ Localizing-Inappropriateness-in-Arguments/
 │   └── llm_reference/
 ├── src/
 │   ├── survey/
-│   │   ├── limesurvey_tsv.py
-│   │   └── survey_design.py
+│   │   └── limesurvey_tsv.py
 │   ├── __init__.py
 │   ├── data.py
 │   ├── prepare_data.py
@@ -291,7 +290,6 @@ All paths below are relative to the repository root. The table documents the res
 | `src/prepare_data.py` | Owns raw-data preparation, normalization, IDs, original predictions, and preparation exports. |
 | `src/utils.py` | Shared normalization, classifier, confusion-type, span-perturbation, highlighting, and serialization helpers. |
 | `src/survey/limesurvey_tsv.py` | Reusable LimeSurvey TSV construction. |
-| `src/survey/survey_design.py` | Balanced explanation assignments and questionnaire variants. |
 | `src/__init__.py` | Package marker; imports can come directly from `src.data` and `src.utils`. |
 | `Makefile` | Environment setup, data preparation, Jupyter startup, cleanup, and survey-generation shortcuts. |
 | `requirements.txt` | Python dependencies for the experimental workflow. |

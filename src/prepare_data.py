@@ -7,7 +7,7 @@ result as a reusable Parquet file.
 
 Run this script from the project root:
 
-    python -m utils.prepare_data
+    python -m src.prepare_data
 
 The generated processed dataset should be treated as the canonical input for
 all experiment notebooks. It must be regenerated whenever the dataset,

@@ -10,7 +10,6 @@ This package provides the canonical data preparation/loading interface and share
 | [data.py](data.py) | Loads and validates the prepared Parquet file. Exposes `load_prepared_dataset()` and `load_prepared_splits()`. |
 | [utils.py](utils.py) | Normalization, classifier inference, confusion types, span masking/deletion/highlighting, serialization, ranking helpers, AOPC exports, logit conversion, and Pareto checks. |
 | [survey/limesurvey_tsv.py](survey/limesurvey_tsv.py) | `LimeSurveyTSVBuilder`, used by the active questionnaire generator. |
-| [survey/survey_design.py](survey/survey_design.py) | Earlier three-explanation Fano design. The final four-explanation design is implemented in `human_study/generate_limesurvey.py`, which does not import this module. |
 | [__init__.py](__init__.py) | Python package marker. Import functions directly from their defining module. |
 
 ## Prepare and load data
@@ -48,7 +47,3 @@ The loader checks required columns, unique `global_row_id` values, and the prese
 - `save_aopc_outputs()` writes the standard five ranking CSV tables to the caller-supplied directory; it does not choose the method's output path.
 
 Data preparation uses the fixed appropriateness classifier with a maximum input length of 512 tokens and automatic CUDA/MPS/CPU selection. After changing preprocessing or prediction settings, rerun preparation and regenerate dependent outputs with compatible settings.
-
-## Current legacy references
-
-Some text in `data.py` still names `utils.prepare_data` or recommends `python -m scripts.prepare_data`. The actual preparation entry point in this repository is **`python -m src.prepare_data`**. Likewise, the three-source design in `survey_design.py` is not the final study's four-source design; consult the active generator and [human-study README](../human_study/README.md).

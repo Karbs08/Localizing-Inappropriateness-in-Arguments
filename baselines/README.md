@@ -36,11 +36,3 @@ Random uses **five draws per argument/configuration** during development, aggreg
 | `final_test_all_window2_topk8/tfidf_final_test_all_window2_topk8_confusion_summary.csv` | Final TF-IDF summary by confusion type. |
 
 Additional exports include span-level tables, JSONL records, plots, and Random sample-level tables. TF-IDF also writes ranking results under `aopc_ranking_evaluation/` and uses a `cache/` directory.
-
-## Before rerunning
-
-Random currently contains an active read of `random_train_val_tp_config_summary.csv` through a local `/Users/karsten/...` path. Replace that read with `OUTPUT_DIR / "random_train_val_tp_config_summary.csv"` when running elsewhere.
-
-The final settings are selected from development results. If they differ in a new run, update downstream filenames consistently. Keep all offsets tied to the shared normalized text and do not select configurations using test results.
-
-Continue with [evaluation](../evaluation/README.md), or inspect the full [results guide](../results/README.md).

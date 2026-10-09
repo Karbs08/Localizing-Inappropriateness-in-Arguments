@@ -47,7 +47,3 @@ For TF-IDF, Attention, IG, SHAP, and MIL, comparison notebooks also read the cor
 - **Caches and checkpoints** support reuse within a compatible run; keep them tied to the same normalized text, model/tokenizer, and settings.
 
 The main test analysis has 438 arguments and 186 TPs; reference agreement uses 100 annotated test TPs. Inspect shared-ID coverage before comparing outputs. Human-facing word-expanded highlights are separate from the raw automatic intervals in these files.
-
-## Producer/reader compatibility
-
-The refined MIL producer currently uses `mil_span_run`, whereas readers expect `mil_span_run_singles`. The LLM producer writes `llm_span_mask_eval_multi_mask_summary.csv`, whereas the comparison reads `llm_span_mask_eval_summary.csv`. The survey preparation additionally reads IG `window1` instead of the thesis's `window3`. Align these paths and configurations before regenerating downstream outputs; details are in the corresponding folder READMEs.

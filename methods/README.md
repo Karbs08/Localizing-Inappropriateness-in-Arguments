@@ -41,10 +41,4 @@ The notebooks select settings from development results; downstream readers conta
 
 The reference uses `gemini-3-flash-preview` and requires `GEMINI_API_KEY` in a root-level `.env` file for generation. It is a silver reference, not gold annotation or a training target. The main exports are `llm_test_tp_spans.csv` and `llm_test_tp_spans_argument_level.csv`.
 
-Before reproducing the complete workflow, align these existing path differences:
-
-- The refined MIL notebook currently sets `RUN_NAME="mil_span_run"`; evaluation and survey readers expect `mil_span_run_singles`. Use the intended run name consistently.
-- The LLM notebook writes `llm_span_mask_eval_multi_mask_summary.csv`, but `methods_vs_llm.ipynb` currently reads `llm_span_mask_eval_summary.csv`.
-- Some LLM cells use working-directory-relative paths and a local `/Users/karsten/...` path. Run with the repository root as the working directory and update machine-specific reads to the corresponding project path. The baseline README documents a similar local path in Random.
-
 For the result layout and downstream consumers, see [results](../results/README.md).

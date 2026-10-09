@@ -31,11 +31,6 @@ The main test comparison uses **438 arguments**, with **186 true positives** as 
 
 `methods_vs_baselines.ipynb` and `methods_vs_llm.ipynb` currently set `BASE_DIR = Path.cwd().parent`. Their kernel working directory must therefore be `evaluation/`. Starting Jupyter from the repository root does not guarantee the kernel directory; check it before running. `mask_vs_delete.ipynb` and `mil_document_level.ipynb` resolve the project root separately.
 
-Two producer/reader differences must be aligned before a fresh full run:
-
-- Final MIL readers expect `results/mil_results/mil_span_run_singles/`; the refined producer currently defaults to `RUN_NAME="mil_span_run"`.
-- The LLM producer writes `llm_span_mask_eval_multi_mask_summary.csv`; the reference comparison reads `llm_span_mask_eval_summary.csv`.
-
 ## Interpretation
 
 Probability drop, PDR, masked-token ratio, and class flips describe complementary aspects of the classifier response. Supplementary logit drops help inspect highly confident predictions. Overlap with LLM spans measures silver-reference agreement, not gold accuracy. MIL bag-classification scores assess a separate learned predictor and do not establish span quality by themselves.
