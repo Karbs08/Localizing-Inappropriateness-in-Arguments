@@ -1,3 +1,14 @@
+"""Evaluate the LimeSurvey results of the human span study.
+
+Read the response export and survey mappings, then reconstruct completeness
+and precision ratings and explanation rankings for each method. Aggregate
+results at participant level and compute descriptive statistics, paired
+comparisons, and inter-rater agreement.
+
+Save evaluation tables and figures to human_study/survey_results/.
+"""
+
+
 from __future__ import annotations
 
 import argparse
@@ -13,6 +24,9 @@ import pandas as pd
 from scipy import stats
 import krippendorff
 
+# ---------------------------------------------------------------------------
+# Paths and survey configuration
+# ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HUMAN_STUDY_DIR = REPO_ROOT / "human_study"
@@ -53,6 +67,10 @@ METRIC_COLORS = {
     "human_f1_like_1_7": "C2",
 }
 
+
+# ---------------------------------------------------------------------------
+# Parsiunf and evaluation functions
+# ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(

@@ -1,6 +1,6 @@
 # From Document to Span: Localizing Reasons for Inappropriateness in Arguments
 
-This repository contains the experimental code for Karsten Bruns's master's thesis on localizing evidence for **inappropriateness in arguments** under weak supervision.
+This repository contains the experimental code for the master's thesis on localizing evidence for **inappropriateness in arguments** under weak supervision.
 
 Starting from a fixed document-level appropriateness classifier, the project asks:
 

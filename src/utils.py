@@ -611,7 +611,7 @@ def make_json_serializable(obj: Any) -> Any:
     return obj
 
 
-# Functions to run Arae over the Perturbation Curve on Attribution based methods
+# Functions to run Area over the Perturbation Curve on Attribution based methods
 def select_top_fraction_indices(
     ranked_indices: Sequence[int],
     total_items: int,

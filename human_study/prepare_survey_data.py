@@ -1,3 +1,15 @@
+"""Prepare argument and span data for the human study.
+
+Combine the saved outputs of six localization methods and the LLM reference.
+Select seven arguments from distinct issues using a fixed random seed and
+align the span annotations for survey presentation.
+
+Adjust display spans to word boundaries while preserving the original
+predictions. Save study items, selected argument IDs, and a span coverage
+report to human_study/survey_input/.
+"""
+
+
 from __future__ import annotations
 
 import ast
@@ -21,10 +33,9 @@ SURVEY_INPUT_DIR = REPO_ROOT / "human_study" / "survey_input"
 RANDOM_SEED = 42
 N_ARGUMENTS = 7
 
-# Use the same tokenizer / maximum sequence length as the document-level
-# appropriateness classifier. The tokenizer is used here ONLY to measure how
-# much model-token coverage changes after the human-readable word-boundary
-# post-processing. The classifier is NOT run again.
+# Use the same tokenizer / maximum sequence length as the document-level appropriateness classifier. 
+# The tokenizer is used here ONLY to measure how much model-token coverage changes 
+# after the human-readable word-boundary post-processing. The classifier is NOT run again.
 TOKENIZER_NAME = "timonziegenbein/appropriateness-classifier-binary"
 MAX_LENGTH = 512
 

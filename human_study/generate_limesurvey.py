@@ -1,3 +1,14 @@
+"""Generate the LimeSurvey import and supporting survey files.
+
+Read the prepared study items and construct seven balanced survey variants.
+Each variant presents four anonymized span explanations per argument for
+completeness and precision ratings, followed by a comparative ranking.
+
+Save the tab-separated import file, HTML preview, design and question
+mappings, and generation report to human_study/survey_output/.
+"""
+
+
 from __future__ import annotations
 
 import argparse
@@ -8,6 +19,11 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+
+
+# ---------------------------------------------------------------------------
+# Paths and survey configuration
+# ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HUMAN_STUDY_DIR = REPO_ROOT / "human_study"
@@ -81,6 +97,10 @@ BLOCK_DISPLAY_ORDER = (
 
 DISPLAY_LABELS = ("A", "B", "C", "D")
 
+
+# ---------------------------------------------------------------------------
+# Parsing and survey generation functions
+# ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
